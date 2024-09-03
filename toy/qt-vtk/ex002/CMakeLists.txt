@@ -1,14 +1,21 @@
-qt_add_executable(qt-vtk-ex002
+set(EXE_NAME "qt-vtk-ex002")
+
+qt_add_executable(${EXE_NAME}
         MainWindow.ui
         MainWindow.cpp
         main.cpp
 )
 
-target_link_libraries(qt-vtk-ex002
-        PRIVATE Qt6::Core
-                ${VTK_LIBRARIES}
+set(MOC_GENERATED_INCLUDE_DIR
+        "${CMAKE_CURRENT_BINARY_DIR}/${EXE_NAME}_autogen/include")
+
+
+target_link_libraries(${EXE_NAME}
+        PUBLIC Qt6::Core
+               ${VTK_LIBRARIES}
 )
 
-target_include_directories(qt-vtk-ex002
-        PUBLIC ${VTK_INCLUDE_DIRS}
+target_include_directories(${EXE_NAME}
+        PUBLIC ${MOC_GENERATED_INCLUDE_DIR}
+               ${VTK_INCLUDE_DIRS}
 )

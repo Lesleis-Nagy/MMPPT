@@ -5,6 +5,7 @@
 #include <iostream>
 
 #include <QVTKOpenGLNativeWidget.h>
+#include <QtCharts/QChart>
 
 #include <vtkPolyDataMapper.h>
 #include <vtkCubeSource.h>
@@ -158,6 +159,13 @@ void MainWindow::slot_btn_process_clicked() {
 void MainWindow::slot_btn_clear_clicked() {
 
   std::cout << "slot_btn_clear_clicked()" << std::endl;
+
+  if (!_four_corners.empty()) {
+    for (const auto& actor : _four_corners) {
+      _renderer->RemoveActor(actor);
+    }
+    _four_corners.erase(_four_corners.begin(), _four_corners.end());
+  }
 
   if (_current_actor.Get() != nullptr) {
 
