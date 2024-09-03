@@ -15,43 +15,59 @@
 #include "vtkCamera.h"
 #include "vtkCoordinate.h"
 
-#include "MainWindow.hpp"
+#include "main_window.hpp"
+
+#include "configuration.hpp"
 
 main_window::main_window() :
 _bg_red(0.0), _bg_green(0.0), _bg_blue(0.0),
 _actor_red(1.0), _actor_green(1.0), _actor_blue(1.0) {
 
+  // Set up the GUI.
   this->setupUi(this);
+
+  // Retrieve configuration.
+  Configuration::get_instance().load_settings();
+
+  // Additional GUI widget setup.
+
+  _status_bar->showMessage("Current file: <None>");
 
   // Create and assign a new vtkRenderer.
   _renderer = vtkSmartPointer<vtkRenderer>::New();
   _renderer->SetBackground(_bg_red, _bg_green, _bg_blue);
   _renderer->ResetCamera();
+  _renderer->GetActiveCamera()->SetParallelProjection(true);
   _vtk_widget->renderWindow()->AddRenderer(_renderer);
 
   // Set the _current_actor to nullptr.
   _current_actor = nullptr;
 
   // Connect signals and slots.
-  connect(_btn_process, SIGNAL(clicked(bool)),
-          this, SLOT(slot_btn_process_clicked()));
-  connect(_btn_cylinder, SIGNAL(clicked(bool)),
-          this, SLOT(slot_btn_cylinder_clicked()));
+  connect(_btn_load_tecplot, SIGNAL(clicked(bool)),
+          this, SLOT(slot_btn_load_tecplot_clicked()));
   connect(_btn_clear, SIGNAL(clicked(bool)),
           this, SLOT(slot_btn_clear_clicked()));
-  connect(_btn_cube, SIGNAL(clicked(bool)),
-          this, SLOT(slot_btn_cube_clicked()));
+  connect(_btn_mfm, SIGNAL(clicked(bool)),
+          this, SLOT(slot_btn_mfm_clicked()));
+  connect(_btn_holography, SIGNAL(clicked(bool)),
+          this, SLOT(slot_btn_holography_clicked()));
 
 }
 
-void main_window::slot_btn_process_clicked() {
+void main_window::slot_btn_load_tecplot_clicked() {
 
+  std::cout << "slot_btn_load_tecplot_clicked()" << std::endl;
+
+  /*
   if (!_four_corners.empty()) {
     for (const auto& actor : _four_corners) {
       _renderer->RemoveActor(actor);
     }
     _four_corners.erase(_four_corners.begin(), _four_corners.end());
   }
+
+ // _renderer->GetActiveCamera()->GetEyePosition()
 
   auto width = (double)_vtk_widget->width();
   auto height = (double)_vtk_widget->height();
@@ -136,7 +152,7 @@ void main_window::slot_btn_process_clicked() {
     vtkSmartPointer<vtkSphereSource> sphere_src = vtkSphereSource::New();
     sphere_src->SetPhiResolution(50);
     sphere_src->SetThetaResolution(50);
-    sphere_src->SetRadius(len*0.01);
+    sphere_src->SetRadius(len*0.05);
 
     vtkSmartPointer<vtkPolyDataMapper> sphere_map = vtkPolyDataMapper::New();
     sphere_map->SetInputConnection(sphere_src->GetOutputPort());
@@ -154,12 +170,15 @@ void main_window::slot_btn_process_clicked() {
   _vtk_widget->update();
   _vtk_widget->renderWindow()->Render();
 
+   */
+
 }
 
 void main_window::slot_btn_clear_clicked() {
 
   std::cout << "slot_btn_clear_clicked()" << std::endl;
 
+  /*
   if (!_four_corners.empty()) {
     for (const auto& actor : _four_corners) {
       _renderer->RemoveActor(actor);
@@ -177,12 +196,19 @@ void main_window::slot_btn_clear_clicked() {
 
   }
 
+  _current_image->set_width(Configuration::get_instance().image_x_res);
+  _current_image->set_height(Configuration::get_instance().image_y_res);
+  emit(_current_image->update_image());
+   */
+
 }
 
-void main_window::slot_btn_cylinder_clicked() {
+void main_window::slot_btn_mfm_clicked() {
 
-  std::cout << "slot_btn_perform_clicked()" << std::endl;
+  std::cout << "slot_btn_mfm_clicked()" << std::endl;
 
+
+  /*
   if (_current_actor.Get() == nullptr) {
 
     std::cout << "The current actor is empty, creating cylinder!" << std::endl;
@@ -215,13 +241,15 @@ void main_window::slot_btn_cylinder_clicked() {
     std::cout << "There is already active actor!" << std::endl;
 
   }
+   */
 
 }
 
-void main_window::slot_btn_cube_clicked() {
+void main_window::slot_btn_holography_clicked() {
 
-  cout << "slot_btn_cube_clicked()" << std::endl;
+  cout << "slot_btn_holography_clicked()" << std::endl;
 
+  /*
   if (_current_actor.Get() == nullptr) {
 
     std::cout << "The current actor is empty, creating cube!" << std::endl;
@@ -253,5 +281,6 @@ void main_window::slot_btn_cube_clicked() {
     std::cout << "There is already active actor!" << std::endl;
 
   }
+  */
 
 }

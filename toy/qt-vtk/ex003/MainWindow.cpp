@@ -9,7 +9,7 @@
 
 #include "MainWindow.hpp"
 
-MainWindow::MainWindow() {
+main_window::main_window() {
 
   this->setupUi(this);
 
@@ -53,9 +53,9 @@ MainWindow::MainWindow() {
 
 }
 
-MainWindow::~MainWindow() = default;
+main_window::~main_window() = default;
 
-void MainWindow::slot_btn_draw_clicked() {
+void main_window::slot_btn_draw_clicked() {
 
   std::cout << "slot_btn_draw_clicked()" << std::endl;
 
@@ -64,7 +64,7 @@ void MainWindow::slot_btn_draw_clicked() {
 }
 
 void
-MainWindow::draw_plot() {
+main_window::draw_plot() {
 
   int nx = _txt_nx->text().toInt();
   int ny = _txt_ny->text().toInt();

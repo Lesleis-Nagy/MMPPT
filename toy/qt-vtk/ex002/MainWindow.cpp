@@ -8,9 +8,9 @@
 
 #include "MainWindow.hpp"
 
-MainWindow::MainWindow() : _bg_red(0.0), _bg_green(0.0), _bg_blue(0.0),
-                           _actor_red(1.0), _actor_green(1.0),
-                           _actor_blue(1.0) {
+main_window::main_window() : _bg_red(0.0), _bg_green(0.0), _bg_blue(0.0),
+                             _actor_red(1.0), _actor_green(1.0),
+                             _actor_blue(1.0) {
   this->setupUi(this);
 
   display_camera_mode();
@@ -86,7 +86,7 @@ MainWindow::MainWindow() : _bg_red(0.0), _bg_green(0.0), _bg_blue(0.0),
 }
 
 void
-MainWindow::slot_btn_toggle_clicked() {
+main_window::slot_btn_toggle_clicked() {
   if (_camera_mode == WORLD_MODE) {
     _camera_mode = OBJECT_MODE;
     _vtk_widget->renderWindow()->GetInteractor()->SetInteractorStyle(
@@ -100,7 +100,7 @@ MainWindow::slot_btn_toggle_clicked() {
 }
 
 void
-MainWindow::display_camera_mode() {
+main_window::display_camera_mode() {
   switch (_camera_mode) {
     case OBJECT_MODE:
       _status_bar->showMessage("Object mode");

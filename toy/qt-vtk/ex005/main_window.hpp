@@ -2,8 +2,8 @@
 // Created by Lesleis Nagy on 23/07/2024.
 //
 
-#ifndef VCOMPARE_TOY_QT_VTK_MAINWINDOWS_HPP_
-#define VCOMPARE_TOY_QT_VTK_MAINWINDOWS_HPP_
+#ifndef MMPPT_TOY_QT_VTK_EX005_MAIN_WINDOW_HPP_
+#define MMPPT_TOY_QT_VTK_EX005_MAIN_WINDOW_HPP_
 
 #include <QMainWindow>
 
@@ -11,7 +11,7 @@
 #include <vtkRenderWindow.h>
 #include <vtkRenderer.h>
 
-#include "ui_MainWindow.h"
+#include "ui_main_window.h"
 
 class main_window : public QMainWindow, private Ui::MainWindow {
   Q_OBJECT
@@ -23,10 +23,10 @@ class main_window : public QMainWindow, private Ui::MainWindow {
 
  public slots:
 
-  void slot_btn_process_clicked();
-  void slot_btn_cylinder_clicked();
-  void slot_btn_cube_clicked();
+  void slot_btn_load_tecplot_clicked();
   void slot_btn_clear_clicked();
+  void slot_btn_mfm_clicked();
+  void slot_btn_holography_clicked();
 
  private:
 
@@ -46,4 +46,4 @@ class main_window : public QMainWindow, private Ui::MainWindow {
 
 };
 
-#endif // VCOMPARE_TOY_QT_VTK_MAINWINDOWS_HPP_
+#endif // MMPPT_TOY_QT_VTK_EX005_MAIN_WINDOW_HPP_

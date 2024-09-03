@@ -21,9 +21,9 @@ class PixelWidget : public QWidget {
   void paintEvent(QPaintEvent*) override;
 
  private:
-  void generateRandomImage();
+  void generate_random_image();
 
-  QImage m_image;
+  QImage _image;
 };
 
 

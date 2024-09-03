@@ -53,7 +53,7 @@ namespace {
     vtkStandardNewMacro(MouseInteractorStyle5);
 }
 
-class MainWindow : public QMainWindow, private Ui::MainWindow {
+class main_window : public QMainWindow, private Ui::MainWindow {
     Q_OBJECT
 
 public:
@@ -67,9 +67,9 @@ public:
     using PtrMouseInteractorStyle5 = vtkSmartPointer<MouseInteractorStyle5>;
     using PtrTrackballCameraStyle = vtkSmartPointer<vtkInteractorStyleTrackballCamera>;
 
-    MainWindow();
+    main_window();
 
-    ~MainWindow() override = default;
+    ~main_window() override = default;
 
 public slots:
 

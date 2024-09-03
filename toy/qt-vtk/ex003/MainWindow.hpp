@@ -14,13 +14,13 @@
 
 #include "ui_MainWindow.h"
 
-class MainWindow : public QMainWindow, private Ui::MainWindow {
+class main_window : public QMainWindow, private Ui::MainWindow {
   Q_OBJECT
 
  public:
 
-  MainWindow();
-  ~MainWindow();
+  main_window();
+  ~main_window();
 
  public slots:
 
