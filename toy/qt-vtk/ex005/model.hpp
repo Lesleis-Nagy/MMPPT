@@ -7,6 +7,11 @@
 
 #include <utility>
 
+#include <vtkActor.h>
+#include <vtkUnstructuredGrid.h>
+#include <vtkProperty.h>
+#include <vtkDataSetMapper.h>
+
 #include "aliases.hpp"
 #include "field.hpp"
 #include "mesh.hpp"
@@ -18,31 +23,64 @@ class Model {
 
  public:
 
-  Model(v_list vcl,
-        tet_list til,
-        sm_list sml) :
-      _mesh{std::move(vcl), std::move(til), std::move(sml)} {}
+  Model(v_list vcl, tet_list til, sm_list sml) :
+      _mesh{std::move(vcl),
+            std::move(til),
+            std::move(sml)} {}
 
-  Model(v_list vcl,
-        tet_list til,
-        sm_list sml,
-        FieldList field_list) :
-      _mesh{std::move(vcl), std::move(til), std::move(sml)},
+  Model(v_list vcl, tet_list til, sm_list sml, FieldList field_list) :
+      _mesh{std::move(vcl),
+            std::move(til),
+            std::move(sml)},
       _field_list{std::move(field_list)} {}
 
   [[nodiscard]] const Mesh &
-  mesh() const { return _mesh; }
+  mesh() const;
 
   [[nodiscard]] const FieldList &
-  field_list() const { return _field_list; }
+  field_list() const;
 
-  void add_list(Field field) { _field_list.add_field(std::move(field)); }
+  void
+  add_field(Field field);
+
+  //--------------------------------------------------------------------------
+  // VTK graphics related functions
+  //--------------------------------------------------------------------------
+
+  void
+  enable_graphics();
+
+  [[nodiscard]] bool
+  graphics_enabled() const;
+
+  [[nodiscard]] vtkSmartPointer<vtkActor>
+  u_grid_actor() const;
 
  private:
 
   Mesh _mesh;
 
   FieldList _field_list;
+
+  // Graphics/display
+
+  // Flag to indicate that graphics are enabled.
+  bool _graphics_enabled{false};
+
+  // Pointer to a VTK unstructured grid.
+  vtkSmartPointer<vtkUnstructuredGrid> _u_grid;
+
+  // Pointer to an unstructured grid dataset mapper.
+  vtkSmartPointer<vtkDataSetMapper> _u_grid_ds_mapper;
+
+  // Pointer to a VTK unstructured grid actor.
+  vtkSmartPointer<vtkActor> _u_grid_actor;
+
+  /**
+   * Function to set up the unstructured grid associated with this mesh.
+   */
+  void
+  setup_u_grid();
 
 };
 

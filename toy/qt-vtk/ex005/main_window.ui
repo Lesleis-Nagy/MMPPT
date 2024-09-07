@@ -60,7 +60,47 @@
            </widget>
           </item>
           <item>
-           <spacer name="horizontalSpacer_2">
+           <widget class="QLabel" name="_lbl_nx">
+            <property name="text">
+             <string>nx:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="_txt_nx">
+            <property name="maximumSize">
+             <size>
+              <width>100</width>
+              <height>16777215</height>
+             </size>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="_lbl_ny">
+            <property name="text">
+             <string>ny:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="_txt_ny">
+            <property name="maximumSize">
+             <size>
+              <width>100</width>
+              <height>16777215</height>
+             </size>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="_spc_001">
             <property name="orientation">
              <enum>Qt::Orientation::Horizontal</enum>
             </property>
@@ -99,7 +139,48 @@
            </widget>
           </item>
           <item>
-           <spacer name="horizontalSpacer">
+           <widget class="QPushButton" name="_btn_save_image">
+            <property name="text">
+             <string>save image</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="_lbl_img_width">
+            <property name="text">
+             <string>width:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="_txt_img_width">
+            <property name="maximumSize">
+             <size>
+              <width>100</width>
+              <height>16777215</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="_lbl_img_height">
+            <property name="text">
+             <string>height:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="_txt_img_height">
+            <property name="maximumSize">
+             <size>
+              <width>100</width>
+              <height>16777215</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="_spc_002">
             <property name="orientation">
              <enum>Qt::Orientation::Horizontal</enum>
             </property>

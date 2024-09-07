@@ -29,87 +29,104 @@
 #include "ui_MainWindow.h"
 
 namespace {
-    // Handle mouse events.
-    class MouseInteractorStyle5 : public vtkInteractorStyleTrackballActor
-    {
-    public:
-        static MouseInteractorStyle5* New();
-        vtkTypeMacro(MouseInteractorStyle5, vtkInteractorStyleTrackballActor);
 
-        void OnLeftButtonDown() override {
-            vtkInteractorStyleTrackballActor::OnLeftButtonDown();
+// Handle mouse events.
+class MouseInteractorStyle5 : public vtkInteractorStyleTrackballActor {
 
-            if (this->InteractionProp == this->cylinder) {
-                std::cout << "Picked cylinder." << std::endl;
-            }
-            else if (this->InteractionProp == this->plane) {
-                std::cout << "Picked plane." << std::endl;
-            }
-        }
+ public:
 
-        vtkActor* cylinder;
-        vtkActor* plane;
-    };
-    vtkStandardNewMacro(MouseInteractorStyle5);
+  static MouseInteractorStyle5 *New();
+
+ vtkTypeMacro(MouseInteractorStyle5, vtkInteractorStyleTrackballActor);
+
+  void OnLeftButtonDown() override {
+    vtkInteractorStyleTrackballActor::OnLeftButtonDown();
+
+    if (this->InteractionProp == this->cylinder) {
+      std::cout << "Picked cylinder." << std::endl;
+    } else if (this->InteractionProp == this->plane) {
+      std::cout << "Picked plane." << std::endl;
+    }
+  }
+
+  void OnKeyPress() override {
+    char key = this->Interactor->GetKeyCode();
+    switch (key) {
+      case 's':
+        std::cout << "S is pressed" << std::endl;
+        break;
+      default:
+        break;
+    }
+
+    vtkInteractorStyleTrackballActor::OnKeyPress();
+  }
+
+  vtkActor *cylinder;
+  vtkActor *plane;
+
+};
+vtkStandardNewMacro(MouseInteractorStyle5);
+
 }
 
 class main_window : public QMainWindow, private Ui::MainWindow {
-    Q_OBJECT
+ Q_OBJECT
 
-public:
+ public:
 
-    using PtrCylinderSource = vtkSmartPointer<vtkCylinderSource>;
-    using PtrPlaneSource = vtkSmartPointer<vtkPlaneSource>;
-    using PtrPolyDataMapper = vtkSmartPointer<vtkPolyDataMapper>;
-    using PtrActor = vtkSmartPointer<vtkActor>;
-    using PtrRenderer = vtkSmartPointer<vtkRenderer>;
-    using PtrRenderWindowInteractor = vtkSmartPointer<vtkRenderWindowInteractor>;
-    using PtrMouseInteractorStyle5 = vtkSmartPointer<MouseInteractorStyle5>;
-    using PtrTrackballCameraStyle = vtkSmartPointer<vtkInteractorStyleTrackballCamera>;
+  using PtrCylinderSource = vtkSmartPointer<vtkCylinderSource>;
+  using PtrPlaneSource = vtkSmartPointer<vtkPlaneSource>;
+  using PtrPolyDataMapper = vtkSmartPointer<vtkPolyDataMapper>;
+  using PtrActor = vtkSmartPointer<vtkActor>;
+  using PtrRenderer = vtkSmartPointer<vtkRenderer>;
+  using PtrRenderWindowInteractor = vtkSmartPointer<vtkRenderWindowInteractor>;
+  using PtrMouseInteractorStyle5 = vtkSmartPointer<MouseInteractorStyle5>;
+  using PtrTrackballCameraStyle = vtkSmartPointer<
+      vtkInteractorStyleTrackballCamera>;
 
-    main_window();
+  main_window();
 
-    ~main_window() override = default;
+  ~main_window() override = default;
 
-public slots:
+ public slots:
 
-    void slot_btn_toggle_clicked();
+  void slot_btn_toggle_clicked();
 
-private:
+ private:
 
-    enum CameraMode {
-        OBJECT_MODE,
-        WORLD_MODE
-    };
+  enum CameraMode {
+    OBJECT_MODE,
+    WORLD_MODE
+  };
 
-    double _bg_red;
-    double _bg_green;
-    double _bg_blue;
+  double _bg_red;
+  double _bg_green;
+  double _bg_blue;
 
-    double _actor_red;
-    double _actor_green;
-    double _actor_blue;
+  double _actor_red;
+  double _actor_green;
+  double _actor_blue;
 
-    CameraMode _camera_mode = WORLD_MODE;
+  CameraMode _camera_mode = WORLD_MODE;
 
-    PtrCylinderSource _cylinder_source;
-    PtrPolyDataMapper _cylinder_poly_data_mapper;
-    PtrPlaneSource _plane_source;
-    PtrPolyDataMapper _plane_poly_data_mapper;
+  PtrCylinderSource _cylinder_source;
+  PtrPolyDataMapper _cylinder_poly_data_mapper;
+  PtrPlaneSource _plane_source;
+  PtrPolyDataMapper _plane_poly_data_mapper;
 
-    PtrRenderer _renderer;
+  PtrRenderer _renderer;
 
-    PtrActor _cylinder_actor;
-    PtrActor _plane_actor;
+  PtrActor _cylinder_actor;
+  PtrActor _plane_actor;
 
-    PtrRenderWindowInteractor _render_window_interactor;
+  PtrRenderWindowInteractor _render_window_interactor;
 
-    PtrMouseInteractorStyle5 _object_interaction_style;
-    PtrTrackballCameraStyle _world_interaction_style;
+  PtrMouseInteractorStyle5 _object_interaction_style;
+  PtrTrackballCameraStyle _world_interaction_style;
 
-    void
-    display_camera_mode();
+  void
+  display_camera_mode();
 };
-
 
 #endif // VCOMPARE_TOY_QT_VTK_MAINWINDOWS_HPP_

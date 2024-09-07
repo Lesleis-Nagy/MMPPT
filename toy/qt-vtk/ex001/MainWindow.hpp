@@ -10,6 +10,7 @@
 #include <vtkSmartPointer.h>
 #include <vtkRenderWindow.h>
 #include <vtkRenderer.h>
+#include <vtkInteractorStyleTrackballCamera.h>
 
 #include "ui_MainWindow.h"
 
@@ -43,6 +44,8 @@ class main_window : public QMainWindow, private Ui::MainWindow {
   vtkSmartPointer<vtkActor> _current_actor;
 
   std::vector<vtkSmartPointer<vtkActor>> _four_corners;
+
+  vtkSmartPointer<vtkInteractorStyleTrackballCamera> _world_interaction_style;
 
 };
 

@@ -10,6 +10,8 @@
 #include <QPainter>
 #include <QRandomGenerator>
 #include <QWidget>
+#include <QColor>
+#include <QColorTransform>
 
 class PixelWidget : public QWidget {
  Q_OBJECT
@@ -26,6 +28,7 @@ class PixelWidget : public QWidget {
   void update_image();
   void set_width(int width);
   void set_height(int height);
+  void save_file(const QString& destination);
 
  protected:
 

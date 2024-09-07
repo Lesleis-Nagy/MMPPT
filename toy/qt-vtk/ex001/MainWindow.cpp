@@ -32,6 +32,9 @@ _actor_red(1.0), _actor_green(1.0), _actor_blue(1.0) {
   // Set the _current_actor to nullptr.
   _current_actor = nullptr;
 
+  _world_interaction_style = vtkInteractorStyleTrackballCamera::New();
+  _world_interaction_style->SetDefaultRenderer(_renderer);
+
   // Connect signals and slots.
   connect(_btn_process, SIGNAL(clicked(bool)),
           this, SLOT(slot_btn_process_clicked()));
@@ -150,6 +153,7 @@ void main_window::slot_btn_process_clicked() {
 
     _renderer->AddActor(sphere_act);
   }
+
 
   _vtk_widget->update();
   _vtk_widget->renderWindow()->Render();
