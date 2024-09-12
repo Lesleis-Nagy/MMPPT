@@ -5,12 +5,20 @@
 #ifndef MMPPT_TOY_QT_VTK_EX005_MODEL_HPP_
 #define MMPPT_TOY_QT_VTK_EX005_MODEL_HPP_
 
+#include <iomanip>
 #include <utility>
+#include <regex>
+#include <sstream>
 
 #include <vtkActor.h>
-#include <vtkUnstructuredGrid.h>
-#include <vtkProperty.h>
+#include <vtkArrayCalculator.h>
 #include <vtkDataSetMapper.h>
+#include <vtkDoubleArray.h>
+#include <vtkGradientFilter.h>
+#include <vtkPointData.h>
+#include <vtkProperty.h>
+#include <vtkRenderer.h>
+#include <vtkUnstructuredGrid.h>
 
 #include "aliases.hpp"
 #include "field.hpp"
@@ -54,7 +62,25 @@ class Model {
   graphics_enabled() const;
 
   [[nodiscard]] vtkSmartPointer<vtkActor>
-  u_grid_actor() const;
+  ugrid_actor() const;
+
+  [[nodiscard]] vtkSmartPointer<vtkDataSetMapper>
+  ugrid_ds_mapper() const;
+
+  [[nodiscard]] vtkSmartPointer<vtkUnstructuredGrid>
+  ugrid() const;
+
+  [[nodiscard]] std::string
+  field_name(const std::string &prefix, int index) const;
+
+  [[nodiscard]] std::optional<int>
+  field_name_index(const std::string &name) const;
+
+  void
+  add_ugrid_actor(vtkSmartPointer<vtkRenderer> &renderer) const;
+
+  void
+  remove_ugrid_actor(vtkSmartPointer<vtkRenderer> &renderer) const;
 
  private:
 
@@ -62,25 +88,45 @@ class Model {
 
   FieldList _field_list;
 
+  std::regex _regex_field_name{R"([a-zA-Z]([0-9]+))"};
+
   // Graphics/display
 
   // Flag to indicate that graphics are enabled.
   bool _graphics_enabled{false};
 
   // Pointer to a VTK unstructured grid.
-  vtkSmartPointer<vtkUnstructuredGrid> _u_grid;
+  vtkSmartPointer<vtkUnstructuredGrid> _ugrid;
 
   // Pointer to an unstructured grid dataset mapper.
-  vtkSmartPointer<vtkDataSetMapper> _u_grid_ds_mapper;
+  vtkSmartPointer<vtkDataSetMapper> _ugrid_ds_mapper;
 
   // Pointer to a VTK unstructured grid actor.
-  vtkSmartPointer<vtkActor> _u_grid_actor;
+  vtkSmartPointer<vtkActor> _ugrid_actor;
+
+  // Field names zero-padding length.
+  int _zero_pad_length{5};
 
   /**
    * Function to set up the unstructured grid associated with this mesh.
    */
   void
-  setup_u_grid();
+  setup_ugrid();
+
+  /**
+   * Function to set up magnetization vector data.
+   */
+  void
+  setup_ugrid_fields();
+
+  void
+  setup_ugrid_field(int index, const Field &field);
+
+  void
+  setup_ugrid_vorticity(int index);
+
+  void
+  setup_ugrid_helicity(int index);
 
 };
 

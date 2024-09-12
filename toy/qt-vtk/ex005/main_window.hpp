@@ -35,10 +35,21 @@ class TrackballInteractor : public vtkInteractorStyleTrackballActor {
 
     vtkInteractorStyleTrackballActor::OnLeftButtonDown();
 
-    if (this->InteractionProp == this->_actor) {
-      std::cout << "the actor is selected." << std::endl;
-    } else {
-      std::cout << "Doing nothing." << std::endl;
+    if (this->InteractionProp == this->cylinder) {
+      std::cout << "Picked cylinder." << std::endl;
+    } else if (this->InteractionProp == this->plane) {
+      std::cout << "Picked plane." << std::endl;
+    }
+  }
+
+  void OnLeftButtonUp() override {
+
+    vtkInteractorStyleTrackballActor::OnLeftButtonUp();
+
+    if (this->InteractionProp == this->cylinder) {
+      std::cout << "Released cylinder." << std::endl;
+    } else if (this->InteractionProp == this->plane) {
+      std::cout << "Released plane." << std::endl;
     }
 
   }
@@ -50,15 +61,12 @@ class TrackballInteractor : public vtkInteractorStyleTrackballActor {
         break;
       default:break;
     }
+
     vtkInteractorStyleTrackballActor::OnKeyPress();
   }
 
-  void set_actor(vtkActor *actor) {
-    _actor = actor;
-  }
-
- private:
-  vtkActor *_actor;
+  vtkSmartPointer<vtkActor> cylinder;
+  vtkSmartPointer<vtkActor> plane;
 
 };
 
@@ -71,11 +79,17 @@ class main_window : public QMainWindow, private Ui::MainWindow {
 
  public:
 
+  // Aliases
+  using PtrRenderer = vtkSmartPointer<vtkRenderer>;
+  using PtrActor = vtkSmartPointer<vtkActor>;
+  using PtrTrackballInteractor = vtkSmartPointer<TrackballInteractor>;
+
   main_window();
   ~main_window() override = default;
 
  public slots:
 
+  void slot_timer_timeout();
   void slot_btn_load_tecplot_clicked();
   void slot_btn_clear_clicked();
   void slot_btn_mfm_clicked();
@@ -89,13 +103,15 @@ class main_window : public QMainWindow, private Ui::MainWindow {
   QRegularExpression _regex_int{R"([0-9]+)"};
   QRegularExpressionValidator _int_validator{_regex_int};
 
-  vtkSmartPointer<vtkRenderer> _renderer;
+  PtrRenderer _renderer;
 
-  vtkSmartPointer<vtkActor> _current_actor;
+  PtrActor _current_actor;
+  PtrActor _plane_actor;
+  PtrActor _plane_origin_actor;
+  PtrActor _plane_point1_actor;
+  PtrActor _plane_point2_actor;
 
-  vtkSmartPointer<TrackballInteractor> _interactor;
-
-  std::vector<vtkSmartPointer<vtkActor>> _four_corners;
+  PtrTrackballInteractor _interactor;
 
   std::optional<Model> _model;
 
