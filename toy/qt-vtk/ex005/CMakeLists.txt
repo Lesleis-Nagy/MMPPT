@@ -4,6 +4,7 @@ qt_add_executable(${EXE_NAME}
         main_window.ui
         main_window.cpp
         pixel_widget.cpp
+        plane_widget.cpp
         model.cpp
         main.cpp
 )

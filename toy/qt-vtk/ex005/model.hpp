@@ -56,6 +56,15 @@ class Model {
   [[nodiscard]] vtkSmartPointer<vtkActor>
   u_grid_actor() const;
 
+  [[nodiscard]] std::array<double, 3>
+  u_grid_center() const {
+
+    double *gc = _u_grid->GetCenter();
+
+    return {gc[0], gc[1], gc[2]};
+
+  }
+
  private:
 
   Mesh _mesh;

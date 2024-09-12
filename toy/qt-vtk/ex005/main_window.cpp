@@ -37,18 +37,19 @@ main_window::main_window() {
       settings.value(CONFIG_CURRENT_IMAGE_HEIGHT, 100).toString()
   );
 
-  _txt_nx->setText(
+  _txt_sample_points_nx->setText(
       settings.value(CONFIG_CURRENT_NX, 30).toString()
   );
-  _txt_ny->setText(
+  _txt_sample_points_ny->setText(
       settings.value(CONFIG_CURRENT_NY, 30).toString()
   );
 
   // Set up validators
-  _txt_nx->setValidator(&_int_validator);
-  _txt_ny->setValidator(&_int_validator);
+  _txt_sample_points_nx->setValidator(&_int_validator);
+  _txt_sample_points_ny->setValidator(&_int_validator);
   _txt_img_width->setValidator(&_int_validator);
   _txt_img_height->setValidator(&_int_validator);
+  //_txt_sample_points_scale->setValidator(&_three_dp_float_validator);
 
   // Set default `_current_image` width/height values.
   int current_image_width = _txt_img_width->text().toInt();
@@ -70,6 +71,9 @@ main_window::main_window() {
     _vtk_widget->renderWindow()->AddRenderer(_renderer);
   }
 
+  _plane_widget = PlaneWidget::New();
+  _plane_widget->SetInteractor(_vtk_widget->renderWindow()->GetInteractor());
+
   _interactor = TrackballInteractor::New();
   _interactor->SetDefaultRenderer(_renderer);
   //_vtk_widget->renderWindow()->GetInteractor()->SetInteractorStyle(
@@ -82,16 +86,29 @@ main_window::main_window() {
   // Connect signals and slots.
   connect(_btn_load_tecplot, SIGNAL(clicked(bool)),
           this, SLOT(slot_btn_load_tecplot_clicked()));
-  connect(_btn_clear, SIGNAL(clicked(bool)),
-          this, SLOT(slot_btn_clear_clicked()));
+  connect(_btn_sample_points_show, SIGNAL(clicked(bool)),
+          this, SLOT(slot_btn_sample_points_show_clicked()));
+  connect(_btn_sample_points_clear, SIGNAL(clicked(bool)),
+          this, SLOT(slot_btn_sample_points_clear_clicked()));
+  connect(_btn_camera_dolly_in, SIGNAL(clicked(bool)),
+          this, SLOT(slot_btn_camera_dolly_in_clicked()));
+  connect(_btn_camera_dolly_out, SIGNAL(clicked(bool)),
+          this, SLOT(slot_btn_camera_dolly_out_clicked()));
+
   connect(_btn_mfm, SIGNAL(clicked(bool)),
           this, SLOT(slot_btn_mfm_clicked()));
   connect(_btn_holography, SIGNAL(clicked(bool)),
           this, SLOT(slot_btn_holography_clicked()));
   connect(_btn_save_image, SIGNAL(clicked(bool)),
           this, SLOT(slot_btn_save_image_clicked()));
-  connect(_txt_nx, SIGNAL(textChanged(const QString &)),
-          this, SLOT(slot_txt_nx_text_changed(const QString &)));
+
+  connect(_hsl_sample_points_scale, SIGNAL(valueChanged(int)),
+          this, SLOT(slot_hsl_sample_points_scale_changed(int)));
+  connect(_txt_sample_points_scale, SIGNAL(textChanged(QString)),
+          this, SLOT(slot_txt_sample_points_scale_changed(QString)));
+
+  connect(_txt_sample_points_nx, SIGNAL(textChanged(QString)),
+          this, SLOT(slot_txt_nx_text_changed(QString)));
 
   emit(_current_image->update_image());
 
@@ -129,159 +146,56 @@ void main_window::slot_btn_load_tecplot_clicked() {
   _current_actor = _model->u_grid_actor();
   _renderer->AddActor(_current_actor);
 
-  _vtk_widget->update();
-  _vtk_widget->renderWindow()->Render();
 
   _status_bar->showMessage(tr("Current file: ") + file_info.absoluteFilePath());
 
   _interactor->set_actor(_current_actor);
 
+  _plane_widget->SetHandleSize(0.01);
+  //_plane_widget->On();
+
+  _renderer->ResetCamera();
+
+  _vtk_widget->update();
+  _vtk_widget->renderWindow()->Render();
+
 }
 
-void main_window::slot_btn_clear_clicked() {
+void main_window::slot_btn_sample_points_show_clicked() {
 
-  std::cout << "slot_btn_clear_clicked()" << std::endl;
+  std::cout << "slot_btn_sample_points_show_clicked()" << std::endl;
 
+  create_world_sample_points();
 
-  /*
-  if (!_four_corners.empty()) {
-    for (const auto& actor : _four_corners) {
-      _renderer->RemoveActor(actor);
-    }
-    _four_corners.erase(_four_corners.begin(), _four_corners.end());
-  }
+  _vtk_widget->update();
+  _vtk_widget->renderWindow()->Render();
 
-  if (_current_actor.Get() != nullptr) {
+}
 
-    _renderer->RemoveActor(_current_actor);
-    _current_actor = nullptr;
+void main_window::slot_btn_sample_points_clear_clicked() {
 
-    _vtk_widget->update();
-    _vtk_widget->renderWindow()->Render();
+  std::cout << "slot_btn_sample_points_clear_clicked()" << std::endl;
 
-  }
+  destroy_world_sample_points();
 
-  _current_image->set_width(Configuration::get_instance().image_x_res);
-  _current_image->set_height(Configuration::get_instance().image_y_res);
+  _vtk_widget->update();
+  _vtk_widget->renderWindow()->Render();
 
-  emit(_current_image->update_image());
-   */
+}
 
-  if (!_four_corners.empty()) {
-    for (const auto &actor : _four_corners) {
-      _renderer->RemoveActor(actor);
-    }
-    _four_corners.erase(_four_corners.begin(), _four_corners.end());
-  }
+void main_window::slot_btn_camera_dolly_in_clicked() {
 
+  _renderer->GetActiveCamera()->Dolly(1.1);
   _renderer->ResetCameraClippingRange();
 
+  _vtk_widget->update();
+  _vtk_widget->renderWindow()->Render();
 
-  //_renderer->ResetCamera();
+}
 
-  // _renderer->GetActiveCamera()->GetEyePosition()
+void main_window::slot_btn_camera_dolly_out_clicked() {
 
-  auto width = (double) _vtk_widget->width();
-  auto height = (double) _vtk_widget->height();
-
-  std::array<double, 3> bottom_left_corner = {0.0, 0.0, 0.0};
-  std::array<double, 3> bottom_right_corner = {2 * width, 0.0, 0.0};
-  std::array<double, 3> top_right_corner = {2 * width, 2 * height, 0.0};
-  std::array<double, 3> top_left_corner = {0.0, 2 * height, 0.0};
-
-  std::array<double, 3> bottom_left_color = {1.0, 0.0, 0.0};
-  std::array<double, 3> bottom_right_color = {0.0, 1.0, 0.0};
-  std::array<double, 3> top_right_color = {0.0, 0.0, 1.0};
-  std::array<double, 3> top_left_color = {1.0, 1.0, 1.0};
-
-  std::array<std::array<double, 3>, 4> corners{
-      bottom_left_corner,
-      bottom_right_corner,
-      top_right_corner,
-      top_left_corner
-  };
-
-  std::array<std::array<double, 3>, 4> colors{
-      bottom_left_color,
-      bottom_right_color,
-      top_right_color,
-      top_left_color
-  };
-
-  vtkSmartPointer<vtkCoordinate> coordinate = vtkCoordinate::New();
-  coordinate->SetCoordinateSystemToDisplay();
-
-  std::array<double, 3> wc_tl = {0.0, 0.0, 0.0};
-  std::array<double, 3> wc_br = {0.0, 0.0, 0.0};
-  double *res;
-
-  coordinate->SetValue(
-      bottom_left_corner[0],
-      bottom_left_corner[1],
-      bottom_left_corner[2]
-  );
-  res = coordinate->GetComputedWorldValue(_renderer);
-  std::copy(res, res + 3, wc_tl.begin());
-  std::cout << "wc_tl: " << wc_tl[0] << ", " << wc_tl[1] << ", " << wc_tl[2]
-            << std::endl;
-
-  coordinate->SetValue(
-      top_right_corner[0],
-      top_right_corner[1],
-      top_right_corner[2]
-  );
-  res = coordinate->GetComputedWorldValue(_renderer);
-  std::copy(res, res + 3, wc_br.begin());
-  std::cout << "wc_br: " << wc_br[0] << ", " << wc_br[1] << ", " << wc_br[2]
-            << std::endl;
-
-  std::cout << "wc_tl[0] - wc_br[0] = " << wc_tl[0] - wc_br[0] << std::endl;
-  std::cout << "wc_tl[1] - wc_br[1] = " << wc_tl[1] - wc_br[1] << std::endl;
-  std::cout << "wc_tl[2] - wc_br[2] = " << wc_tl[2] - wc_br[2] << std::endl;
-
-  double xl2 = pow(wc_tl[0] - wc_br[0], 2.0);
-  std::cout << "xl2: " << xl2 << std::endl;
-  double yl2 = pow(wc_tl[1] - wc_br[1], 2.0);
-  std::cout << "yl2: " << yl2 << std::endl;
-  double zl2 = pow(wc_tl[2] - wc_br[2], 2.0);
-  std::cout << "zl2: " << zl2 << std::endl;
-
-  double len = sqrt(xl2 + yl2 + zl2);
-
-  std::cout << "len: " << len << std::endl;
-
-  for (int i = 0; i < 4; ++i) {
-    auto c = corners[i];
-    auto color = colors[i];
-    coordinate->SetValue(c[0], c[1], c[2]);
-    std::array<double, 3> wc = {0.0, 0.0, 0.0};
-    res = coordinate->GetComputedWorldValue(_renderer);
-    std::copy(res, res + 3, wc.begin());
-
-    std::cout << "World equivalent of ("
-              << c[0] << ", " << c[1] << ", " << c[2] << "): "
-              << wc[0] << ", " << wc[1] << ", " << wc[2] << ")"
-              << std::endl;
-
-    vtkSmartPointer<vtkSphereSource> sphere_src = vtkSphereSource::New();
-    sphere_src->SetPhiResolution(50);
-    sphere_src->SetThetaResolution(50);
-    sphere_src->SetRadius(len * 0.05);
-
-    vtkSmartPointer<vtkPolyDataMapper> sphere_map = vtkPolyDataMapper::New();
-    sphere_map->SetInputConnection(sphere_src->GetOutputPort());
-
-    vtkSmartPointer<vtkActor> sphere_act = vtkActor::New();
-    sphere_act->SetMapper(sphere_map);
-    sphere_act->SetPosition(wc[0], wc[1], wc[2]);
-    sphere_act->GetProperty()->SetColor(color[0], color[1], color[2]);
-
-    _four_corners.push_back(sphere_act);
-
-    _renderer->AddActor(sphere_act);
-
-  }
-
+  _renderer->GetActiveCamera()->Dolly(0.9);
   _renderer->ResetCameraClippingRange();
 
   _vtk_widget->update();
@@ -380,7 +294,8 @@ main_window::slot_btn_save_image_clicked() {
 
   QSettings settings;
 
-  QString last_save_dir = settings.value(CONFIG_LAST_IMG_SAVE_DIR, "").toString();
+  QString
+      last_save_dir = settings.value(CONFIG_LAST_IMG_SAVE_DIR, "").toString();
 
   std::array<QString, 2> exts = {
       tr("png"),
@@ -423,8 +338,227 @@ main_window::slot_btn_save_image_clicked() {
 }
 
 void
-main_window::slot_txt_nx_text_changed(const QString &text) {
+main_window::slot_hsl_sample_points_scale_changed(int value) {
 
-  std::cout << "slot_txt_nx_text_changed() --> text = '" << text.toStdString() << "'" << std::endl;
+  std::cout << "slot_hsl_sample_points_scale_changed: " << value << std::endl;
+
+  double scale = (double) value / 1000.0;
+  _txt_sample_points_scale->setText(QString::number(scale));
+
+}
+
+void
+main_window::slot_txt_sample_points_scale_changed(QString text) {
+
+  std::cout << "slot_txt_sample_points_scale_changed: " << text.toStdString()
+            << std::endl;
+
+}
+
+void
+main_window::slot_txt_nx_text_changed(QString text) {
+
+  std::cout << "slot_txt_nx_text_changed() --> text = '" << text.toStdString()
+            << "'" << std::endl;
+
+}
+
+void
+main_window::create_world_sample_points() {
+
+  destroy_world_sample_points();
+
+  // Retrieve the width/height of the viewing plane.
+
+  auto width = (double) _vtk_widget->width();
+  auto height = (double) _vtk_widget->height();
+
+  // Define 4 positions for the
+  //    bottom-left,
+  //    bottom-right,
+  //    top-right,
+  //    top-left
+  // corners of the viewing plane.
+
+  std::array<double, 3> bottom_left_corner = {0.0, 0.0, 0.0};
+  std::array<double, 3> bottom_right_corner = {2 * width, 0.0, 0.0};
+  std::array<double, 3> top_right_corner = {2 * width, 2 * height, 0.0};
+  std::array<double, 3> top_left_corner = {0.0, 2 * height, 0.0};
+
+  // Define 4 colours for the
+  //    bottom-left,
+  //    bottom-right,
+  //    top-right,
+  //    top-left
+  // corners of the viewing plane.
+
+  std::array<double, 3> bottom_left_color = {1.0, 0.0, 0.0};
+  std::array<double, 3> bottom_right_color = {0.0, 1.0, 0.0};
+  std::array<double, 3> top_right_color = {0.0, 0.0, 1.0};
+  std::array<double, 3> top_left_color = {1.0, 1.0, 1.0};
+
+  // Put the four viewing plane positions in to an array called `corners`.
+
+  std::array<std::array<double, 3>, 4> corners{
+      bottom_left_corner,
+      bottom_right_corner,
+      top_right_corner,
+      top_left_corner
+  };
+
+  // Put the four colours in to an array called `colours`.
+
+  std::array<std::array<double, 3>, 4> colors{
+      bottom_left_color,
+      bottom_right_color,
+      top_right_color,
+      top_left_color
+  };
+
+  // Create a new `vtkCoordinate` object - this will map viewing plane
+  // coordinates to world coordinates.
+
+  vtkSmartPointer<vtkCoordinate> coordinate = vtkCoordinate::New();
+  coordinate->SetCoordinateSystemToDisplay();
+
+  // Initialize the world coordinate top-left (`wc_tl`) position and
+  // bottom-right position (`wc_br`) along with a pointer to an array of doubles
+  // (`res`, the use of which becomes apparent later).
+  std::array<double, 3> wc_tl = {0.0, 0.0, 0.0};
+  std::array<double, 3> wc_br = {0.0, 0.0, 0.0};
+  double *res;
+
+  // Send the value of the bottom left coordinate to the `coordinate` object,
+  // this is the viewing-plane coordinate that will be mapped.
+  coordinate->SetValue(
+      bottom_left_corner[0],
+      bottom_left_corner[1],
+      bottom_left_corner[2]
+  );
+
+  // Retrieve the world-coordinate equivalent of the current coordinate
+  // (which we set as `bottom_left_corner` above) and capture it using the `res`
+  // pointer.
+  res = coordinate->GetComputedWorldValue(_renderer);
+
+  // Copy the values referred to by the `res` pointer to a new array `wc_tl`
+  // (recall `wc_tl` is the world-coordinate top-left). We do this because
+  // each time we call `GetComputerWorldValue` the values that `res` points
+  // to get changed since it is `coordinate` that holds the values of any
+  // mapping.
+
+  std::copy(res, res + 3, wc_tl.begin());
+  std::cout << "wc_tl: " << wc_tl[0] << ", " << wc_tl[1] << ", " << wc_tl[2]
+            << std::endl;
+
+  // Repeat the above steps, with the `top_right_corner` variable.
+
+  // Send view-plane values to `coordinate`.
+  coordinate->SetValue(
+      top_right_corner[0],
+      top_right_corner[1],
+      top_right_corner[2]
+  );
+
+  // Do the mapping.
+  res = coordinate->GetComputedWorldValue(_renderer);
+
+  // Copy the mapping to a local variable (`wc_br`).
+  std::copy(res, res + 3, wc_br.begin());
+  std::cout << "wc_br: " << wc_br[0] << ", " << wc_br[1] << ", " << wc_br[2]
+            << std::endl;
+
+  // Compute a characteristic length (`len`) of the representation of the
+  // viewing plane in world-coordinates.
+
+  std::cout << "wc_tl[0] - wc_br[0] = " << wc_tl[0] - wc_br[0] << std::endl;
+  std::cout << "wc_tl[1] - wc_br[1] = " << wc_tl[1] - wc_br[1] << std::endl;
+  std::cout << "wc_tl[2] - wc_br[2] = " << wc_tl[2] - wc_br[2] << std::endl;
+
+  double xl2 = pow(wc_tl[0] - wc_br[0], 2.0);
+  std::cout << "xl2: " << xl2 << std::endl;
+  double yl2 = pow(wc_tl[1] - wc_br[1], 2.0);
+  std::cout << "yl2: " << yl2 << std::endl;
+  double zl2 = pow(wc_tl[2] - wc_br[2], 2.0);
+  std::cout << "zl2: " << zl2 << std::endl;
+
+  double len = sqrt(xl2 + yl2 + zl2);
+
+  std::cout << "len: " << len << std::endl;
+
+  for (int i = 0; i < 4; ++i) {
+    auto c = corners[i];
+    auto color = colors[i];
+    coordinate->SetValue(c[0], c[1], c[2]);
+    std::array<double, 3> wc = {0.0, 0.0, 0.0};
+    res = coordinate->GetComputedWorldValue(_renderer);
+    std::copy(res, res + 3, wc.begin());
+
+    std::cout << "World equivalent of ("
+              << c[0] << ", " << c[1] << ", " << c[2] << "): "
+              << wc[0] << ", " << wc[1] << ", " << wc[2] << ")"
+              << std::endl;
+
+    vtkSmartPointer<vtkSphereSource> sphere_src = vtkSphereSource::New();
+    sphere_src->SetPhiResolution(50);
+    sphere_src->SetThetaResolution(50);
+    sphere_src->SetRadius(len * _txt_sample_points_scale->text().toDouble());
+
+    vtkSmartPointer<vtkPolyDataMapper> sphere_map = vtkPolyDataMapper::New();
+    sphere_map->SetInputConnection(sphere_src->GetOutputPort());
+
+    vtkSmartPointer<vtkActor> sphere_act = vtkActor::New();
+    sphere_act->SetMapper(sphere_map);
+    sphere_act->SetPosition(wc[0], wc[1], wc[2]);
+    sphere_act->GetProperty()->SetColor(color[0], color[1], color[2]);
+
+    _world_sample_points.push_back(sphere_act);
+
+    _renderer->AddActor(sphere_act);
+
+  }
+
+  auto mc = _model->mesh().centroid();
+  std::cout << "Centroid of mesh: "
+            << mc[0] << ", "
+            << mc[1] << ", "
+            << mc[2] << std::endl;
+
+  std::array<double, 3> pc = {
+      (wc_br[0] + wc_tl[0]) / 2.0,
+      (wc_br[1] + wc_tl[1]) / 2.0,
+      (wc_br[2] + wc_tl[2]) / 2.0,
+  };
+
+  std::cout << "Centroid of screen (world coords): "
+            << pc[0] << ", "
+            << pc[1] << ", "
+            << pc[2] << std::endl;
+
+  double distance = sqrt(pow(mc[0] - pc[0], 2) +
+      pow(mc[1] - pc[1], 2) +
+      pow(mc[2] - pc[2], 2));
+
+  std::cout << "Distance: " << distance << std::endl;
+
+}
+
+
+void
+main_window::destroy_world_sample_points() {
+
+  // Remove the spheres at each of the four corners of the viewing plane.
+
+  if (!_world_sample_points.empty()) {
+    for (const auto &actor : _world_sample_points) {
+      _renderer->RemoveActor(actor);
+    }
+    _world_sample_points.erase(
+        _world_sample_points.begin(),
+        _world_sample_points.end()
+    );
+  }
+
+  _renderer->ResetCameraClippingRange();
 
 }
