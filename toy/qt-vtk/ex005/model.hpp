@@ -119,14 +119,17 @@ class Model {
   void
   setup_ugrid_fields();
 
+  /**
+   * Unstructured grid.
+   */
   void
   setup_ugrid_field(int index, const Field &field);
 
+  /**
+   * Unstructured grid calculations.
+   */
   void
-  setup_ugrid_vorticity(int index);
-
-  void
-  setup_ugrid_helicity(int index);
+  setup_ugrid_calculations(int index);
 
 };
 

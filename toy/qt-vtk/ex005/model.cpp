@@ -136,7 +136,7 @@ void Model::setup_ugrid_fields() {
   for (int i = 0; i < _field_list.n_fields(); ++i) {
     const auto &f = _field_list.fields()[i];
     setup_ugrid_field(i, f);
-    setup_ugrid_vorticity(i);
+    setup_ugrid_calculations(i);
   }
 
 }
@@ -164,9 +164,9 @@ Model::setup_ugrid_field(int index, const Field &field) {
 }
 
 void
-Model::setup_ugrid_vorticity(int index) {
+Model::setup_ugrid_calculations(int index) {
 
-  std::cout << "setup_ugrid_vorticity()" << std::endl;
+  std::cout << "setup_ugrid_calculations()" << std::endl;
 
   vtkSmartPointer<vtkGradientFilter> vorticity = vtkGradientFilter::New();
 
@@ -228,14 +228,28 @@ Model::setup_ugrid_vorticity(int index) {
   hug_darray->SetNumberOfComponents(1);
   hug_darray->SetNumberOfTuples(hug_array->GetNumberOfTuples());
 
+  for (vtkIdType i = 0; i < hug_array->GetNumberOfTuples(); ++i) {
+    hug_darray->SetValue(i, hug_array->GetTuple(i)[0]);
+  }
+  _ugrid->GetPointData()->AddArray(hug_darray);
+
+  // Add relative helicity field
+
+  vtkUnstructuredGrid *rhug =
+      vtkUnstructuredGrid::SafeDownCast(relative_helicity->GetOutput());
+
+  vtkSmartPointer<vtkDoubleArray> rhug_array =
+      vtkDoubleArray::SafeDownCast(rhug->GetPointData()->GetArray(rh.c_str()));
+
+  vtkSmartPointer<vtkDoubleArray> rhug_darray = vtkDoubleArray::New();
+  rhug_darray->SetName(rh.c_str());
+  rhug_darray->SetNumberOfComponents(1);
+  rhug_darray->SetNumberOfTuples(rhug_array->GetNumberOfTuples());
+
+  for (vtkIdType i = 0; i < rhug_array->GetNumberOfTuples(); ++i) {
+    rhug_darray->SetValue(i, rhug_array->GetTuple(i)[0]);
+  }
+  _ugrid->GetPointData()->AddArray(rhug_darray);
+
 }
 
-void
-Model::setup_ugrid_helicity(int index) {
-
-  std::cout << "setup_ugrid_helicity()" << std::endl;
-
-
-
-
-}
