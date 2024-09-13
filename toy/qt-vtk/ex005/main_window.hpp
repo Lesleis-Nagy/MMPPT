@@ -15,10 +15,13 @@
 #include <vtkRenderer.h>
 #include <vtkInteractorStyleTrackballActor.h>
 #include <vtkObjectFactory.h>
+#include <vtkPlaneSource.h>
 
 #include "ui_main_window.h"
+#include "preferences_dialog.hpp"
 
 #include "model.hpp"
+
 
 namespace {
 
@@ -74,7 +77,8 @@ vtkStandardNewMacro(TrackballInteractor);
 
 }
 
-class main_window : public QMainWindow, private Ui::MainWindow {
+class MainWindow : public QMainWindow, private Ui::MainWindow {
+
  Q_OBJECT
 
  public:
@@ -84,19 +88,30 @@ class main_window : public QMainWindow, private Ui::MainWindow {
   using PtrActor = vtkSmartPointer<vtkActor>;
   using PtrTrackballInteractor = vtkSmartPointer<TrackballInteractor>;
 
-  main_window();
-  ~main_window() override = default;
+  MainWindow();
+  ~MainWindow() override = default;
 
  public slots:
 
   void slot_timer_timeout();
   void slot_btn_load_tecplot_clicked();
   void slot_btn_clear_clicked();
+  void slot_btn_set_arrow_scale_clicked();
+  void slot_btn_camera_x_clicked();
+  void slot_btn_camera_y_clicked();
+  void slot_btn_camera_z_clicked();
+  void slot_btn_put_plane_clicked();
+  void slot_btn_remove_plane_clicked();
+  void slot_chk_ugrid_changed(Qt::CheckState state);
+  void slot_chk_vectors_changed(Qt::CheckState state);
+  void slot_sli_ugrid_opacity_changed(int value);
+  void slot_sli_vector_opacity_changed(int value);
+
   void slot_btn_mfm_clicked();
   void slot_btn_holography_clicked();
   void slot_btn_save_image_clicked();
 
-  void slot_txt_nx_text_changed(const QString &);
+  void slot_menu_preferences();
 
  private:
 
@@ -112,15 +127,54 @@ class main_window : public QMainWindow, private Ui::MainWindow {
 
   PtrRenderer _renderer;
 
-  PtrActor _current_actor;
-  PtrActor _plane_actor;
-  PtrActor _plane_origin_actor;
-  PtrActor _plane_point1_actor;
-  PtrActor _plane_point2_actor;
+  vtkSmartPointer<vtkPlaneSource> _plane_source;
+  vtkSmartPointer<vtkPolyDataMapper> _plane_poly_data_mapper;
+  vtkSmartPointer<vtkActor> _plane_actor;
+
+  vtkSmartPointer<vtkActor> _plane_origin_actor;
+  vtkSmartPointer<vtkActor> _plane_point1_actor;
+  vtkSmartPointer<vtkActor> _plane_point2_actor;
 
   PtrTrackballInteractor _interactor;
 
+  bool _model_ugrid_actor_showing{false};
+  bool _model_arrow_actor_showing{false};
   std::optional<Model> _model;
+
+  //--------------------------------------------------------------------------
+
+  void
+  clear_model();
+
+  void
+  hide_ugrid_actor();
+
+  void
+  show_ugrid_actor();
+
+  void
+  hide_arrow_actor();
+
+  void
+  show_arrow_actor();
+
+  void
+  set_ugrid_opacity(double);
+
+  void
+  set_arrow_opacity(double);
+
+  void
+  set_arrow_scale(double);
+
+  void
+  set_camera_to_x_pos();
+
+  void
+  set_camera_to_y_pos();
+
+  void
+  set_camera_to_z_pos();
 
 };
 

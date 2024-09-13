@@ -84,7 +84,7 @@ vtkStandardNewMacro(MouseInteractorStyle5);
 
 }
 
-class main_window : public QMainWindow, private Ui::MainWindow {
+class MainWindow : public QMainWindow, private Ui::MainWindow {
  Q_OBJECT
 
  public:
@@ -100,9 +100,9 @@ class main_window : public QMainWindow, private Ui::MainWindow {
   using PtrTrackballCameraStyle = vtkSmartPointer<
       vtkInteractorStyleTrackballCamera>;
 
-  main_window();
+  MainWindow();
 
-  ~main_window() override = default;
+  ~MainWindow() override = default;
 
  public slots:
 

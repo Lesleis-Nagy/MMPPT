@@ -22,7 +22,7 @@
 #include "main_window.hpp"
 #include "load_tecplot.hpp"
 
-main_window::main_window() {
+MainWindow::MainWindow() {
 
   // Set up the GUI.
   this->setupUi(this);
@@ -40,33 +40,6 @@ main_window::main_window() {
 
   // Retrieve the settings object.
   QSettings settings;
-
-  _txt_img_width->setText(
-      settings.value(CONFIG_CURRENT_IMAGE_WIDTH, 100).toString()
-  );
-  _txt_img_height->setText(
-      settings.value(CONFIG_CURRENT_IMAGE_HEIGHT, 100).toString()
-  );
-
-  _txt_nx->setText(
-      settings.value(CONFIG_CURRENT_NX, 30).toString()
-  );
-  _txt_ny->setText(
-      settings.value(CONFIG_CURRENT_NY, 30).toString()
-  );
-
-  // Set up validators
-  _txt_nx->setValidator(&_int_validator);
-  _txt_ny->setValidator(&_int_validator);
-  _txt_img_width->setValidator(&_int_validator);
-  _txt_img_height->setValidator(&_int_validator);
-
-  // Set default `_current_image` width/height values.
-  int current_image_width = _txt_img_width->text().toInt();
-  int current_image_height = _txt_img_height->text().toInt();
-
-  _current_image->set_width(current_image_width);
-  _current_image->set_height(current_image_height);
 
   // Additional GUI widget setup.
   _status_bar->showMessage("Current file: <None>");
@@ -87,28 +60,49 @@ main_window::main_window() {
   //    _interactor
   //);
 
-  // Set the _current_actor to nullptr.
-  _current_actor = nullptr;
-
   // Connect signals and slots.
   connect(_btn_load_tecplot, SIGNAL(clicked(bool)),
           this, SLOT(slot_btn_load_tecplot_clicked()));
   connect(_btn_clear, SIGNAL(clicked(bool)),
           this, SLOT(slot_btn_clear_clicked()));
+  connect(_btn_set_arrow_scale, SIGNAL(clicked(bool)),
+          this, SLOT(slot_btn_set_arrow_scale_clicked()));
+  connect(_btn_camera_x, SIGNAL(clicked(bool)),
+          this, SLOT(slot_btn_camera_x_clicked()));
+  connect(_btn_camera_y, SIGNAL(clicked(bool)),
+          this, SLOT(slot_btn_camera_y_clicked()));
+  connect(_btn_camera_z, SIGNAL(clicked(bool)),
+          this, SLOT(slot_btn_camera_z_clicked()));
+  connect(_btn_put_plane, SIGNAL(clicked(bool)),
+          this, SLOT(slot_btn_put_plane_clicked()));
+  connect(_btn_remove_plane, SIGNAL(clicked(bool)),
+          this, SLOT(slot_btn_remove_plane_clicked()));
+
+  connect(_chk_ugrid, SIGNAL(checkStateChanged(Qt::CheckState)),
+          this, SLOT(slot_chk_ugrid_changed(Qt::CheckState)));
+  connect(_chk_vectors, SIGNAL(checkStateChanged(Qt::CheckState)),
+          this, SLOT(slot_chk_vectors_changed(Qt::CheckState)));
+  connect(_sli_ugrid_opacity, SIGNAL(valueChanged(int)),
+          this, SLOT(slot_sli_ugrid_opacity_changed(int)));
+  connect(_sli_vector_opacity, SIGNAL(valueChanged(int)),
+          this, SLOT(slot_sli_vector_opacity_changed(int)));
+
   connect(_btn_mfm, SIGNAL(clicked(bool)),
           this, SLOT(slot_btn_mfm_clicked()));
   connect(_btn_holography, SIGNAL(clicked(bool)),
           this, SLOT(slot_btn_holography_clicked()));
   connect(_btn_save_image, SIGNAL(clicked(bool)),
           this, SLOT(slot_btn_save_image_clicked()));
-  connect(_txt_nx, SIGNAL(textChanged(const QString &)),
-          this, SLOT(slot_txt_nx_text_changed(const QString &)));
+
+  connect(_preferencesAction, &QAction::triggered,
+          this, &MainWindow::slot_menu_preferences);
 
   emit(_current_image->update_image());
 
 }
 
-void main_window::slot_btn_load_tecplot_clicked() {
+void
+MainWindow::slot_btn_load_tecplot_clicked() {
 
   QSettings settings;
 
@@ -123,6 +117,8 @@ void main_window::slot_btn_load_tecplot_clicked() {
     return;
   }
 
+  clear_model();
+
   QFileInfo file_info{selected_file_name};
 
   QString abs_path = file_info.absolutePath();
@@ -136,39 +132,25 @@ void main_window::slot_btn_load_tecplot_clicked() {
   );
 
   _model->enable_graphics();
+  _model->set_arrow_scale(_txt_arrow_scale->text().toDouble());
 
-  //_current_actor = _model->ugrid_actor();
-  //_renderer->AddActor(_current_actor);
+  show_arrow_actor();
+  show_ugrid_actor();
 
-  //_model->add_ugrid_actor(_renderer);
-  _model->add_arrow_actor(_renderer);
+  _chk_ugrid->setCheckState(Qt::CheckState::Checked);
+  _chk_vectors->setCheckState(Qt::CheckState::Checked);
+
+  _status_bar->showMessage(tr("Current file: ") + file_info.absoluteFilePath());
 
   _vtk_widget->update();
   _vtk_widget->renderWindow()->Render();
 
-  _status_bar->showMessage(tr("Current file: ") + file_info.absoluteFilePath());
-
-  //_interactor->set_actor(_current_actor);
-
-  std::cout << "Helicity" << std::endl;
-  for (const auto& kv : _model->heli_minmax()) {
-    std::cout << kv.first;
-    std::cout << " min: " << kv.second.min << ", ";
-    std::cout << " max: " << kv.second.max << ", ";
-    std::cout << std::endl;
-  }
-
-  std::cout << "Relative helicity" << std::endl;
-  for (const auto& kv : _model->rheli_minmax()) {
-    std::cout << kv.first;
-    std::cout << " min: " << kv.second.min << ", ";
-    std::cout << " max: " << kv.second.max << ", ";
-    std::cout << std::endl;
-  }
-
 }
 
-void main_window::slot_btn_clear_clicked() {
+void
+MainWindow::slot_btn_clear_clicked() {
+
+  clear_model();
 
   _renderer->ResetCameraClippingRange();
 
@@ -177,20 +159,152 @@ void main_window::slot_btn_clear_clicked() {
 
 }
 
-void main_window::slot_btn_mfm_clicked() {
+void
+MainWindow::slot_btn_set_arrow_scale_clicked() {
+
+  set_arrow_scale(_txt_arrow_scale->text().toDouble());
+
+  _vtk_widget->update();
+  _vtk_widget->renderWindow()->Render();
+
+}
+
+void
+MainWindow::slot_btn_camera_x_clicked() {
+
+  set_camera_to_x_pos();
+
+  _renderer->ResetCamera();
+  _renderer->ResetCameraClippingRange();
+  _vtk_widget->update();
+  _vtk_widget->renderWindow()->Render();
+
+}
+
+void
+MainWindow::slot_btn_camera_y_clicked() {
+
+  set_camera_to_y_pos();
+
+  _renderer->ResetCamera();
+  _renderer->ResetCameraClippingRange();
+  _vtk_widget->update();
+  _vtk_widget->renderWindow()->Render();
+
+}
+
+void
+MainWindow::slot_btn_camera_z_clicked() {
+
+  set_camera_to_z_pos();
+
+  _renderer->ResetCamera();
+  _renderer->ResetCameraClippingRange();
+  _vtk_widget->update();
+  _vtk_widget->renderWindow()->Render();
+
+}
+
+void
+MainWindow::slot_btn_put_plane_clicked() {
+
+  std::cout << "slot_btn_put_plane_clicked" << std::endl;
+
+  // TODO: Check to see if I can put a plane, i.e. if there is any data in
+  //       the boxes.
+
+  // Set the plane _plane_actor.
+  _plane_source = vtkPlaneSource::New();
+  _plane_source->SetResolution(10, 10);
+  _plane_source->SetCenter(0, 0, 0);
+  _plane_source->SetNormal(0, 0, 1);
+  _plane_source->Update();
+
+  _plane_poly_data_mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+  _plane_poly_data_mapper->SetInputConnection(_plane_source->GetOutputPort());
+
+  _plane_actor = vtkActor::New();
+  _plane_actor->SetMapper(_plane_poly_data_mapper);
+  _plane_actor->GetProperty()->SetColor(1, 1, 1);
+  _plane_actor->GetProperty()->LightingOff();
+
+  _renderer->AddActor(_plane_actor);
+
+
+  _vtk_widget->update();
+  _vtk_widget->renderWindow()->Render();
+
+}
+
+void
+MainWindow::slot_btn_remove_plane_clicked() {
+
+  std::cout << "slot_btn_remove_plane_clicked" << std::endl;
+
+}
+
+void
+MainWindow::slot_chk_ugrid_changed(Qt::CheckState state) {
+
+  if (state == Qt::CheckState::Checked) {
+    show_ugrid_actor();
+  } else {
+    hide_ugrid_actor();
+  }
+
+  _vtk_widget->update();
+  _vtk_widget->renderWindow()->Render();
+
+}
+
+void
+MainWindow::slot_chk_vectors_changed(Qt::CheckState state) {
+
+  if (state == Qt::CheckState::Checked) {
+    show_arrow_actor();
+  } else {
+    hide_arrow_actor();
+  }
+
+  _vtk_widget->update();
+  _vtk_widget->renderWindow()->Render();
+
+}
+
+void
+MainWindow::slot_sli_ugrid_opacity_changed(int value) {
+
+  set_ugrid_opacity((double) value / 1000.0);
+
+  _vtk_widget->update();
+  _vtk_widget->renderWindow()->Render();
+
+}
+
+void
+MainWindow::slot_sli_vector_opacity_changed(int value) {
+
+  set_arrow_opacity((double) value / 1000.0);
+
+  _vtk_widget->update();
+  _vtk_widget->renderWindow()->Render();
+
+}
+
+void MainWindow::slot_btn_mfm_clicked() {
 
   std::cout << "slot_btn_mfm_clicked()" << std::endl;
 
 }
 
-void main_window::slot_btn_holography_clicked() {
+void MainWindow::slot_btn_holography_clicked() {
 
   cout << "slot_btn_holography_clicked()" << std::endl;
 
 }
 
 void
-main_window::slot_btn_save_image_clicked() {
+MainWindow::slot_btn_save_image_clicked() {
 
   cout << "slot_btn_save_image_clicked()" << std::endl;
 
@@ -198,7 +312,8 @@ main_window::slot_btn_save_image_clicked() {
 
   QSettings settings;
 
-  QString last_save_dir = settings.value(CONFIG_LAST_IMG_SAVE_DIR, "").toString();
+  QString
+      last_save_dir = settings.value(CONFIG_LAST_IMG_SAVE_DIR, "").toString();
 
   std::array<QString, 2> exts = {
       tr("png"),
@@ -241,8 +356,131 @@ main_window::slot_btn_save_image_clicked() {
 }
 
 void
-main_window::slot_txt_nx_text_changed(const QString &text) {
+MainWindow::slot_menu_preferences() {
 
-  std::cout << "slot_txt_nx_text_changed() --> text = '" << text.toStdString() << "'" << std::endl;
+  std::cout << "slot_menu_preferences()" << std::endl;
+
+  PreferencesDialog preferences_dialog;
+  preferences_dialog.exec();
+
+}
+
+//----------------------------------------------------------------------------
+
+void
+MainWindow::clear_model() {
+
+  hide_ugrid_actor();
+  hide_arrow_actor();
+
+  _chk_ugrid->setCheckState(Qt::CheckState::Unchecked);
+  _chk_vectors->setCheckState(Qt::CheckState::Unchecked);
+
+}
+
+void
+MainWindow::hide_ugrid_actor() {
+
+  if (_model.has_value()) {
+    if (_model_ugrid_actor_showing) {
+      _model->remove_ugrid_actor(_renderer);
+      _model_ugrid_actor_showing = false;
+    }
+  }
+
+}
+
+void
+MainWindow::show_ugrid_actor() {
+
+  if (_model.has_value()) {
+    if (!_model_ugrid_actor_showing) {
+      _model->add_ugrid_actor(_renderer);
+      _model_ugrid_actor_showing = true;
+    }
+  }
+}
+
+void
+MainWindow::hide_arrow_actor() {
+  if (_model.has_value()) {
+    if (_model_arrow_actor_showing) {
+      _model->remove_arrow_actor(_renderer);
+      _model_arrow_actor_showing = false;
+    }
+  }
+
+}
+
+void
+MainWindow::show_arrow_actor() {
+  if (_model.has_value()) {
+    if (!_model_arrow_actor_showing) {
+      _model->add_arrow_actor(_renderer);
+      _model_arrow_actor_showing = true;
+    }
+  }
+}
+
+void
+MainWindow::set_ugrid_opacity(double opacity) {
+
+  if (_model.has_value()) {
+    _model->set_ugrid_opacity(opacity);
+  }
+
+}
+
+void
+MainWindow::set_arrow_opacity(double opacity) {
+
+  if (_model.has_value()) {
+    _model->set_arrow_opacity(opacity);
+  }
+
+}
+
+void
+MainWindow::set_arrow_scale(double scale) {
+
+  if (_model.has_value()) {
+    _model->set_arrow_scale(scale);
+  }
+
+}
+
+void
+MainWindow::set_camera_to_x_pos() {
+
+  if (_model.has_value()) {
+    std::array c = _model->center();
+    _renderer->GetActiveCamera()->SetPosition(-1, 0, 0);
+    _renderer->GetActiveCamera()->SetFocalPoint(c[0], c[1], c[2]);
+    _renderer->GetActiveCamera()->SetViewUp(0, 1, 0);
+  }
+
+}
+
+void
+MainWindow::set_camera_to_y_pos() {
+
+  if (_model.has_value()) {
+    std::array c = _model->center();
+    _renderer->GetActiveCamera()->SetPosition(0, -1, 0);
+    _renderer->GetActiveCamera()->SetFocalPoint(c[0], c[1], c[2]);
+    _renderer->GetActiveCamera()->SetViewUp(1, 0, 0);
+  }
+
+}
+
+void
+MainWindow::set_camera_to_z_pos() {
+
+  if (_model.has_value()) {
+    std::array c = _model->center();
+    _renderer->GetActiveCamera()->SetPosition(0, 0, -1);
+    _renderer->GetActiveCamera()->SetFocalPoint(c[0], c[1], c[2]);
+    _renderer->GetActiveCamera()->SetViewUp(0, 1, 0);
+  }
 
 }

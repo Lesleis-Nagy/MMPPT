@@ -17,7 +17,7 @@
 
 #include "MainWindow.hpp"
 
-main_window::main_window() :
+MainWindow::MainWindow() :
 _bg_red(0.0), _bg_green(0.0), _bg_blue(0.0),
 _actor_red(1.0), _actor_green(1.0), _actor_blue(1.0) {
 
@@ -47,7 +47,7 @@ _actor_red(1.0), _actor_green(1.0), _actor_blue(1.0) {
 
 }
 
-void main_window::slot_btn_process_clicked() {
+void MainWindow::slot_btn_process_clicked() {
 
   if (!_four_corners.empty()) {
     for (const auto& actor : _four_corners) {
@@ -160,7 +160,7 @@ void main_window::slot_btn_process_clicked() {
 
 }
 
-void main_window::slot_btn_clear_clicked() {
+void MainWindow::slot_btn_clear_clicked() {
 
   std::cout << "slot_btn_clear_clicked()" << std::endl;
 
@@ -183,7 +183,7 @@ void main_window::slot_btn_clear_clicked() {
 
 }
 
-void main_window::slot_btn_cylinder_clicked() {
+void MainWindow::slot_btn_cylinder_clicked() {
 
   std::cout << "slot_btn_perform_clicked()" << std::endl;
 
@@ -222,7 +222,7 @@ void main_window::slot_btn_cylinder_clicked() {
 
 }
 
-void main_window::slot_btn_cube_clicked() {
+void MainWindow::slot_btn_cube_clicked() {
 
   cout << "slot_btn_cube_clicked()" << std::endl;
 

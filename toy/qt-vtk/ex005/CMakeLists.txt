@@ -3,6 +3,8 @@ set(EXE_NAME "qt-vtk-ex005")
 qt_add_executable(${EXE_NAME}
         main_window.ui
         main_window.cpp
+        preferences_dialog.ui
+        preferences_dialog.cpp
         pixel_widget.cpp
         model.cpp
         main.cpp

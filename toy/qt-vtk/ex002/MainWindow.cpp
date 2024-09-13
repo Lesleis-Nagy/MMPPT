@@ -8,9 +8,9 @@
 
 #include "MainWindow.hpp"
 
-main_window::main_window() : _bg_red(0.0), _bg_green(0.0), _bg_blue(0.0),
-                             _actor_red(1.0), _actor_green(1.0),
-                             _actor_blue(1.0) {
+MainWindow::MainWindow() : _bg_red(0.0), _bg_green(0.0), _bg_blue(0.0),
+                           _actor_red(1.0), _actor_green(1.0),
+                           _actor_blue(1.0) {
 
   this->setupUi(this);
   _timer = new QTimer(this);
@@ -124,14 +124,14 @@ main_window::main_window() : _bg_red(0.0), _bg_green(0.0), _bg_blue(0.0),
           this, SLOT(slot_btn_toggle_clicked()));
 
   connect(_timer, &QTimer::timeout,
-          this, &main_window::slot_timer_timeout);
+          this, &MainWindow::slot_timer_timeout);
 
   _timer->start();
 
 }
 
 void
-main_window::slot_timer_timeout() {
+MainWindow::slot_timer_timeout() {
 
   double ori[4] = {1.0, 1.0, 1.0, 1.0};
   double pt1[4] = {1.0, 1.0, 1.0, 1.0};;
@@ -201,7 +201,7 @@ main_window::slot_timer_timeout() {
 }
 
 void
-main_window::slot_btn_toggle_clicked() {
+MainWindow::slot_btn_toggle_clicked() {
   if (_camera_mode == WORLD_MODE) {
     _camera_mode = OBJECT_MODE;
     _vtk_widget->renderWindow()->GetInteractor()->SetInteractorStyle(
@@ -215,7 +215,7 @@ main_window::slot_btn_toggle_clicked() {
 }
 
 void
-main_window::display_camera_mode() {
+MainWindow::display_camera_mode() {
   switch (_camera_mode) {
     case OBJECT_MODE:_status_bar->showMessage("Object mode");
       break;

@@ -14,13 +14,13 @@
 
 #include "ui_MainWindow.h"
 
-class main_window : public QMainWindow, private Ui::MainWindow {
+class MainWindow : public QMainWindow, private Ui::MainWindow {
   Q_OBJECT
 
  public:
 
-  main_window();
-  ~main_window() override = default;
+  MainWindow();
+  ~MainWindow() override = default;
 
  public slots:
 

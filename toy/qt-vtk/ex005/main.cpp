@@ -21,7 +21,7 @@ int main(int argc, char *argv[]) {
   QApplication::setOrganizationName(APP_ORG_NAME);
   QApplication::setApplicationName(APP_NAME);
 
-  main_window main_window;
+  MainWindow main_window;
   main_window.show();
 
   return QApplication::exec();

@@ -79,6 +79,29 @@ Model::rheli_minmax() const {
   return _rheli_minmax;
 }
 
+double
+Model::length_scale() const {
+
+  double bbox[6];
+  _ugrid_actor->GetBounds(bbox);
+
+  return std::sqrt(
+      pow(bbox[1] - bbox[0], 2.0)
+          + pow(bbox[3] - bbox[2], 2.0)
+          + pow(bbox[5] - bbox[4], 2.0)
+  );
+
+}
+
+std::array<double, 3>
+Model::center() const {
+
+  double *center = _ugrid_actor->GetCenter();
+
+  return {center[0], center[1], center[2]};
+
+}
+
 void
 Model::add_ugrid_actor(vtkSmartPointer<vtkRenderer> &renderer) const {
   if (_ugrid_actor) {
@@ -105,6 +128,21 @@ Model::remove_arrow_actor(vtkSmartPointer<vtkRenderer> &renderer) const {
   if (_arrow_actor) {
     renderer->RemoveActor(_arrow_actor);
   }
+}
+
+void
+Model::set_ugrid_opacity(double opacity) {
+  _ugrid_actor->GetProperty()->SetOpacity(opacity);
+}
+
+void
+Model::set_arrow_opacity(double opacity) {
+  _arrow_actor->GetProperty()->SetOpacity(opacity);
+}
+
+void
+Model::set_arrow_scale(double scale) {
+  _arrow_glyph->SetScaleFactor(scale * length_scale());
 }
 
 //--------------------------------------------------------------------------

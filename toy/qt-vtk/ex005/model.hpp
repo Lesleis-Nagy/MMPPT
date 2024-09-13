@@ -94,6 +94,12 @@ class Model {
   [[nodiscard]] std::unordered_map<std::string, MinMax>
   rheli_minmax() const;
 
+  [[nodiscard]] double
+  length_scale() const;
+
+  [[nodiscard]] std::array<double, 3>
+  center() const;
+
   void
   add_ugrid_actor(vtkSmartPointer<vtkRenderer> &renderer) const;
 
@@ -105,6 +111,15 @@ class Model {
 
   void
   remove_arrow_actor(vtkSmartPointer<vtkRenderer> &renderer) const;
+
+  void
+  set_ugrid_opacity(double opacity);
+
+  void
+  set_arrow_opacity(double opacity);
+
+  void
+  set_arrow_scale(double scale);
 
  private:
 
