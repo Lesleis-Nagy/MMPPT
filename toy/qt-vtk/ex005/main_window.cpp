@@ -27,6 +27,17 @@ main_window::main_window() {
   // Set up the GUI.
   this->setupUi(this);
 
+  // Create the settings menu
+  _settingsMenu = new QMenu("Settings", this);
+  menuBar()->addMenu(_settingsMenu);
+
+  // Add actions to the settings menu
+  _preferencesAction = _settingsMenu->addAction("Preferences");
+  _preferencesAction->setMenuRole(QAction::PreferencesRole);
+
+  _aboutAction = _settingsMenu->addAction("About");
+  _aboutAction->setMenuRole(QAction::AboutRole);
+
   // Retrieve the settings object.
   QSettings settings;
 
@@ -126,8 +137,11 @@ void main_window::slot_btn_load_tecplot_clicked() {
 
   _model->enable_graphics();
 
-  _current_actor = _model->ugrid_actor();
-  _renderer->AddActor(_current_actor);
+  //_current_actor = _model->ugrid_actor();
+  //_renderer->AddActor(_current_actor);
+
+  //_model->add_ugrid_actor(_renderer);
+  _model->add_arrow_actor(_renderer);
 
   _vtk_widget->update();
   _vtk_widget->renderWindow()->Render();
@@ -135,6 +149,22 @@ void main_window::slot_btn_load_tecplot_clicked() {
   _status_bar->showMessage(tr("Current file: ") + file_info.absoluteFilePath());
 
   //_interactor->set_actor(_current_actor);
+
+  std::cout << "Helicity" << std::endl;
+  for (const auto& kv : _model->heli_minmax()) {
+    std::cout << kv.first;
+    std::cout << " min: " << kv.second.min << ", ";
+    std::cout << " max: " << kv.second.max << ", ";
+    std::cout << std::endl;
+  }
+
+  std::cout << "Relative helicity" << std::endl;
+  for (const auto& kv : _model->rheli_minmax()) {
+    std::cout << kv.first;
+    std::cout << " min: " << kv.second.min << ", ";
+    std::cout << " max: " << kv.second.max << ", ";
+    std::cout << std::endl;
+  }
 
 }
 

@@ -6,18 +6,25 @@
 #define MMPPT_TOY_QT_VTK_EX005_MODEL_HPP_
 
 #include <iomanip>
-#include <utility>
 #include <regex>
 #include <sstream>
+#include <unordered_set>
+#include <utility>
 
 #include <vtkActor.h>
 #include <vtkArrayCalculator.h>
+#include <vtkArrowSource.h>
 #include <vtkDataSetMapper.h>
 #include <vtkDoubleArray.h>
+#include <vtkGlyph3D.h>
 #include <vtkGradientFilter.h>
+#include <vtkLookupTable.h>
 #include <vtkPointData.h>
+#include <vtkPolyDataMapper.h>
 #include <vtkProperty.h>
 #include <vtkRenderer.h>
+#include <vtkTransform.h>
+#include <vtkTransformPolyDataFilter.h>
 #include <vtkUnstructuredGrid.h>
 
 #include "aliases.hpp"
@@ -30,6 +37,11 @@
 class Model {
 
  public:
+
+  struct MinMax {
+    double min;
+    double max;
+  };
 
   Model(v_list vcl, tet_list til, sm_list sml) :
       _mesh{std::move(vcl),
@@ -76,11 +88,23 @@ class Model {
   [[nodiscard]] std::optional<int>
   field_name_index(const std::string &name) const;
 
+  [[nodiscard]] std::unordered_map<std::string, MinMax>
+  heli_minmax() const;
+
+  [[nodiscard]] std::unordered_map<std::string, MinMax>
+  rheli_minmax() const;
+
   void
   add_ugrid_actor(vtkSmartPointer<vtkRenderer> &renderer) const;
 
   void
   remove_ugrid_actor(vtkSmartPointer<vtkRenderer> &renderer) const;
+
+  void
+  add_arrow_actor(vtkSmartPointer<vtkRenderer> &renderer) const;
+
+  void
+  remove_arrow_actor(vtkSmartPointer<vtkRenderer> &renderer) const;
 
  private:
 
@@ -92,8 +116,23 @@ class Model {
 
   // Graphics/display
 
+  // Field names zero-padding length.
+  int _zero_pad_length{5};
+
   // Flag to indicate that graphics are enabled.
   bool _graphics_enabled{false};
+
+  // Field name.
+  std::vector<std::string> _mag_names;
+  std::vector<std::string> _vort_names;
+  std::vector<std::string> _heli_names;
+  std::vector<std::string> _rheli_names;
+
+  // Field helicity min/max values
+  std::unordered_map<std::string, MinMax> _heli_minmax;
+
+  // Field relative helicity min/max value (absolute range [-1, 1]).
+  std::unordered_map<std::string, MinMax> _rheli_minmax;
 
   // Pointer to a VTK unstructured grid.
   vtkSmartPointer<vtkUnstructuredGrid> _ugrid;
@@ -104,8 +143,33 @@ class Model {
   // Pointer to a VTK unstructured grid actor.
   vtkSmartPointer<vtkActor> _ugrid_actor;
 
-  // Field names zero-padding length.
-  int _zero_pad_length{5};
+  // Arrow source.
+  vtkSmartPointer<vtkArrowSource> _arrow_source;
+
+  // Arrow transform.
+  vtkSmartPointer<vtkTransform> _arrow_transform;
+
+  // Arrow transform filter.
+  vtkSmartPointer<vtkTransformPolyDataFilter> _arrow_transform_filter;
+
+  // Arrow glyph.
+  vtkSmartPointer<vtkGlyph3D> _arrow_glyph;
+
+  // Arrow colour lookup table.
+  vtkSmartPointer<vtkLookupTable> _arrow_colour_lookup_table;
+
+  // Arrow poly data mapper
+  vtkSmartPointer<vtkPolyDataMapper> _arrow_glyph_poly_data_mapper;
+
+  // Arrow actor.
+  vtkSmartPointer<vtkActor> _arrow_actor;
+
+  // Arrow shaft/tip resolution.
+  int _arrow_shaft_resolution{10};
+  int _arrow_tip_resolution{30};
+
+  // Arrow scale.
+  double _arrow_scale{.005};
 
   /**
    * Function to set up the unstructured grid associated with this mesh.
@@ -130,6 +194,9 @@ class Model {
    */
   void
   setup_ugrid_calculations(int index);
+
+  void
+  setup_arrows();
 
 };
 

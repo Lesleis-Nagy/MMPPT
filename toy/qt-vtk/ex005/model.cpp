@@ -26,6 +26,11 @@ Model::add_field(Field field) {
 void Model::enable_graphics() {
   setup_ugrid();
   setup_ugrid_fields();
+  setup_arrows();
+
+  _ugrid->GetPointData()->SetActiveVectors(_mag_names[0].c_str());
+  _ugrid->GetPointData()->SetActiveScalars(_rheli_names[0].c_str());
+
   _graphics_enabled = true;
 }
 
@@ -64,6 +69,16 @@ Model::field_name_index(const std::string &name) const {
   return std::nullopt;
 }
 
+std::unordered_map<std::string, Model::MinMax>
+Model::heli_minmax() const {
+  return _heli_minmax;
+}
+
+std::unordered_map<std::string, Model::MinMax>
+Model::rheli_minmax() const {
+  return _rheli_minmax;
+}
+
 void
 Model::add_ugrid_actor(vtkSmartPointer<vtkRenderer> &renderer) const {
   if (_ugrid_actor) {
@@ -78,11 +93,26 @@ Model::remove_ugrid_actor(vtkSmartPointer<vtkRenderer> &renderer) const {
   }
 }
 
+void
+Model::add_arrow_actor(vtkSmartPointer<vtkRenderer> &renderer) const {
+  if (_arrow_actor) {
+    renderer->AddActor(_arrow_actor);
+  }
+}
+
+void
+Model::remove_arrow_actor(vtkSmartPointer<vtkRenderer> &renderer) const {
+  if (_arrow_actor) {
+    renderer->RemoveActor(_arrow_actor);
+  }
+}
+
 //--------------------------------------------------------------------------
 // Private functions.
 //--------------------------------------------------------------------------
 
-void Model::setup_ugrid() {
+void
+Model::setup_ugrid() {
 
   // Create the unstructured grid.
 
@@ -90,7 +120,7 @@ void Model::setup_ugrid() {
 
   // Add vertex points to the unstructured grid.
   vtkSmartPointer<vtkPoints> points = vtkPoints::New();
-  points->SetNumberOfPoints((vtkIdType)_mesh.vcl().size());
+  points->SetNumberOfPoints((vtkIdType) _mesh.vcl().size());
 
   const auto &vcl = _mesh.vcl();
   for (vtkIdType i = 0; i < vcl.size(); ++i) {
@@ -129,7 +159,8 @@ void Model::setup_ugrid() {
 
 }
 
-void Model::setup_ugrid_fields() {
+void
+Model::setup_ugrid_fields() {
 
   std::cout << "setup_ugrid_fields()" << std::endl;
 
@@ -151,7 +182,7 @@ Model::setup_ugrid_field(int index, const Field &field) {
   vtkSmartPointer<vtkDoubleArray> f = vtkDoubleArray::New();
   f->SetName(field_name("m", index).c_str());
   f->SetNumberOfComponents(3);
-  f->SetNumberOfTuples((vtkIdType)vectors.size());
+  f->SetNumberOfTuples((vtkIdType) vectors.size());
 
   for (vtkIdType i = 0; i < vectors.size(); ++i) {
     double fd[3] = {vectors[i][0], vectors[i][1], vectors[i][2]};
@@ -159,7 +190,6 @@ Model::setup_ugrid_field(int index, const Field &field) {
   }
 
   _ugrid->GetPointData()->AddArray(f);
-
 
 }
 
@@ -170,16 +200,16 @@ Model::setup_ugrid_calculations(int index) {
 
   vtkSmartPointer<vtkGradientFilter> vorticity = vtkGradientFilter::New();
 
-  std::string m = field_name("m", index);
-  std::string v = field_name("v", index);
-  std::string h = field_name("h", index);
-  std::string rh = field_name("rh", index);
+  std::string mag_name = field_name("m", index);
+  std::string vort_name = field_name("v", index);
+  std::string heli_name = field_name("h", index);
+  std::string rheli_name = field_name("rh", index);
 
   // Vorticity computation.
 
   vorticity->ComputeVorticityOn();
-  vorticity->SetInputArrayToProcess(0, 0, 0, 0, m.c_str());
-  vorticity->SetVorticityArrayName(v.c_str());
+  vorticity->SetInputArrayToProcess(0, 0, 0, 0, mag_name.c_str());
+  vorticity->SetVorticityArrayName(vort_name.c_str());
   vorticity->SetInputData(_ugrid);
   vorticity->Update();
 
@@ -189,12 +219,12 @@ Model::setup_ugrid_calculations(int index) {
       vtkArrayCalculator::New();
 
   std::stringstream ss_h_func;
-  ss_h_func << "dot(" << m << ", " << v << ")";
+  ss_h_func << "dot(" << mag_name << ", " << vort_name << ")";
 
   helicity->SetAttributeTypeToPointData();
-  helicity->AddVectorArrayName(m.c_str());
-  helicity->AddVectorArrayName(v.c_str());
-  helicity->SetResultArrayName(h.c_str());
+  helicity->AddVectorArrayName(mag_name.c_str());
+  helicity->AddVectorArrayName(vort_name.c_str());
+  helicity->SetResultArrayName(heli_name.c_str());
   helicity->SetFunction(ss_h_func.str().c_str());
   helicity->SetInputData(vorticity->GetOutput());
   helicity->Update();
@@ -205,12 +235,14 @@ Model::setup_ugrid_calculations(int index) {
       vtkArrayCalculator::New();
 
   std::stringstream ss_rh_func;
-  ss_rh_func << "dot(" << m << ", " << v << ") / mag(" << v << ")";
+  ss_rh_func << "dot(" << mag_name << ", " << vort_name << ")";
+  ss_rh_func << "/";
+  ss_rh_func << "mag(" << vort_name << ")";
 
   relative_helicity->SetAttributeTypeToPointData();
-  relative_helicity->AddVectorArrayName(m.c_str());
-  relative_helicity->AddVectorArrayName(v.c_str());
-  relative_helicity->SetResultArrayName(rh.c_str());
+  relative_helicity->AddVectorArrayName(mag_name.c_str());
+  relative_helicity->AddVectorArrayName(vort_name.c_str());
+  relative_helicity->SetResultArrayName(rheli_name.c_str());
   relative_helicity->SetFunction(ss_rh_func.str().c_str());
   relative_helicity->SetInputData(vorticity->GetOutput());
   relative_helicity->Update();
@@ -221,17 +253,22 @@ Model::setup_ugrid_calculations(int index) {
       vtkUnstructuredGrid::SafeDownCast(helicity->GetOutput());
 
   vtkSmartPointer<vtkDoubleArray> hug_array =
-      vtkDoubleArray::SafeDownCast(hug->GetPointData()->GetArray(h.c_str()));
+      vtkDoubleArray::SafeDownCast(
+          hug->GetPointData()->GetArray(heli_name.c_str())
+      );
 
   vtkSmartPointer<vtkDoubleArray> hug_darray = vtkDoubleArray::New();
-  hug_darray->SetName(h.c_str());
+  hug_darray->SetName(heli_name.c_str());
   hug_darray->SetNumberOfComponents(1);
   hug_darray->SetNumberOfTuples(hug_array->GetNumberOfTuples());
 
   for (vtkIdType i = 0; i < hug_array->GetNumberOfTuples(); ++i) {
     hug_darray->SetValue(i, hug_array->GetTuple(i)[0]);
   }
+  double hrange[2];
+  hug_darray->GetRange(hrange);
   _ugrid->GetPointData()->AddArray(hug_darray);
+  _heli_minmax[heli_name] = {.min = hrange[0], .max = hrange[1]};
 
   // Add relative helicity field
 
@@ -239,17 +276,75 @@ Model::setup_ugrid_calculations(int index) {
       vtkUnstructuredGrid::SafeDownCast(relative_helicity->GetOutput());
 
   vtkSmartPointer<vtkDoubleArray> rhug_array =
-      vtkDoubleArray::SafeDownCast(rhug->GetPointData()->GetArray(rh.c_str()));
+      vtkDoubleArray::SafeDownCast(
+          rhug->GetPointData()->GetArray(rheli_name.c_str())
+      );
 
   vtkSmartPointer<vtkDoubleArray> rhug_darray = vtkDoubleArray::New();
-  rhug_darray->SetName(rh.c_str());
+  rhug_darray->SetName(rheli_name.c_str());
   rhug_darray->SetNumberOfComponents(1);
   rhug_darray->SetNumberOfTuples(rhug_array->GetNumberOfTuples());
 
   for (vtkIdType i = 0; i < rhug_array->GetNumberOfTuples(); ++i) {
     rhug_darray->SetValue(i, rhug_array->GetTuple(i)[0]);
   }
+  double rhrange[2];
+  rhug_darray->GetRange(rhrange);
   _ugrid->GetPointData()->AddArray(rhug_darray);
+  _rheli_minmax[rheli_name] = {.min = rhrange[0], .max = rhrange[1]};
+
+  // Push back the names for magnetization, vorticity, helicity and relative
+  // helicity.
+  _mag_names.push_back(mag_name);
+  _vort_names.push_back(vort_name);
+  _heli_names.push_back(heli_name);
+  _rheli_names.push_back(rheli_name);
 
 }
 
+void
+Model::setup_arrows() {
+
+  _arrow_source = vtkArrowSource::New();
+  _arrow_source->SetShaftResolution(_arrow_shaft_resolution);
+  _arrow_source->SetTipResolution(_arrow_tip_resolution);
+
+  _arrow_transform = vtkTransform::New();
+  _arrow_transform->Translate(-0.5, 0.0, 0.0);
+
+  _arrow_transform_filter = vtkTransformPolyDataFilter::New();
+  _arrow_transform_filter->SetTransform(_arrow_transform);
+  _arrow_transform_filter->SetInputConnection(_arrow_source->GetOutputPort());
+
+  _arrow_glyph = vtkGlyph3D::New();
+  _arrow_glyph->SetInputData(_ugrid);
+  _arrow_glyph->SetSourceConnection(_arrow_transform_filter->GetOutputPort());
+  _arrow_glyph->SetScaleModeToScaleByVector();
+  _arrow_glyph->SetVectorModeToUseVector();
+  _arrow_glyph->SetColorModeToColorByScalar();
+  _arrow_glyph->ScalingOn();
+  _arrow_glyph->OrientOn();
+  _arrow_glyph->SetScaleFactor(_arrow_scale);
+  _arrow_glyph->Update();
+
+  _arrow_colour_lookup_table = vtkLookupTable::New();
+  _arrow_colour_lookup_table->SetNumberOfColors(256);
+  //_arrow_colour_lookup_table->SetHueRange(0.0, 1.0);
+  _arrow_colour_lookup_table->SetTableRange(-1.0, 1.0);
+  _arrow_colour_lookup_table->SetHueRange(0.0, 1.0);;
+  _arrow_colour_lookup_table->SetSaturationRange(1.0, 1.0);
+  _arrow_colour_lookup_table->SetValueRange(1.0, 1.0);
+  _arrow_colour_lookup_table->Build();
+
+  _arrow_glyph_poly_data_mapper = vtkPolyDataMapper::New();
+  _arrow_glyph_poly_data_mapper->SetInputConnection(
+      _arrow_glyph->GetOutputPort()
+  );
+  _arrow_glyph_poly_data_mapper->SetLookupTable(_arrow_colour_lookup_table);
+  _arrow_glyph_poly_data_mapper->SetScalarRange(-1.0, 1.0);
+  _arrow_glyph_poly_data_mapper->Update();
+
+  _arrow_actor = vtkActor::New();
+  _arrow_actor->SetMapper(_arrow_glyph_poly_data_mapper);
+
+}

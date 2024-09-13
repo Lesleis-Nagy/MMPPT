@@ -100,6 +100,13 @@ class main_window : public QMainWindow, private Ui::MainWindow {
 
  private:
 
+  // Create the settings menu
+  QMenu* _settingsMenu;
+
+  // Add actions to the settings menu
+  QAction* _preferencesAction;
+  QAction* _aboutAction;
+
   QRegularExpression _regex_int{R"([0-9]+)"};
   QRegularExpressionValidator _int_validator{_regex_int};
 
