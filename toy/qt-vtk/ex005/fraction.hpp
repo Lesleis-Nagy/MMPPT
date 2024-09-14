@@ -226,14 +226,8 @@ struct std::hash<FractionPair> {
   }
 };
 
-std::ostream &operator<<(std::ostream &out, const Fraction &fp) {
-  out << fp.numerator() << "/" << fp.denominator();
-  return out;
-}
+std::ostream &operator<<(std::ostream &out, const Fraction &fp);
 
-std::ostream &operator<<(std::ostream &out, const FractionPair &fp) {
-  out << "(" << fp.first << ", " << fp.second << ")";
-  return out;
-}
+std::ostream &operator<<(std::ostream &out, const FractionPair &fp);
 
 #endif // MMPPT_TOY_QT_VTK_EX005_FRACTION_HPP_

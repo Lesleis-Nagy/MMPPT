@@ -2,25 +2,9 @@
 // Created by Lesleis Nagy on 23/07/2024.
 //
 
-#include <iostream>
 
-#include <QVTKOpenGLNativeWidget.h>
-#include <QtCharts/QChart>
-#include <QFileDialog>
-
-#include <vtkPolyDataMapper.h>
-#include <QErrorMessage>
-#include <QMessageBox>
-#include <vtkSphereSource.h>
-#include "vtkCylinderSource.h"
-#include "vtkProperty.h"
-#include "vtkCamera.h"
-#include "vtkCoordinate.h"
-#include "vtkRendererCollection.h"
-
-#include "config_consts.h"
 #include "main_window.hpp"
-#include "load_tecplot.hpp"
+
 
 MainWindow::MainWindow() {
 
@@ -100,6 +84,12 @@ MainWindow::MainWindow() {
   emit(_current_image->update_image());
 
 }
+
+void
+MainWindow::slot_timer_timeout() {
+
+}
+
 
 void
 MainWindow::slot_btn_load_tecplot_clicked() {

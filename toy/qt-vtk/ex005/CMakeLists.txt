@@ -8,6 +8,7 @@ qt_add_executable(${EXE_NAME}
         pixel_widget.cpp
         model.cpp
         main.cpp
+        fraction.cpp
 )
 
 set(MOC_GENERATED_INCLUDE_DIR

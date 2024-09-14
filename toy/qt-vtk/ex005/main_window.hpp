@@ -5,23 +5,38 @@
 #ifndef MMPPT_TOY_QT_VTK_EX005_MAIN_WINDOW_HPP_
 #define MMPPT_TOY_QT_VTK_EX005_MAIN_WINDOW_HPP_
 
+#include <iostream>
+
+#include <QErrorMessage>
+#include <QFileDialog>
 #include <QMainWindow>
-#include <QSettings>
+#include <QMessageBox>
 #include <QRegularExpression>
 #include <QRegularExpressionValidator>
+#include <QSettings>
+#include <QtCharts/QChart>
+#include <QVTKOpenGLNativeWidget.h>
 
-#include <vtkSmartPointer.h>
-#include <vtkRenderWindow.h>
-#include <vtkRenderer.h>
+#include <vtkCamera.h>
+#include <vtkCoordinate.h>
+#include <vtkCylinderSource.h>
 #include <vtkInteractorStyleTrackballActor.h>
 #include <vtkObjectFactory.h>
 #include <vtkPlaneSource.h>
+#include <vtkPolyDataMapper.h>
+#include <vtkProperty.h>
+#include <vtkRendererCollection.h>
+#include <vtkRenderer.h>
+#include <vtkRenderWindow.h>
+#include <vtkSmartPointer.h>
+#include <vtkSphereSource.h>
 
 #include "ui_main_window.h"
-#include "preferences_dialog.hpp"
 
+#include "config_consts.h"
+#include "load_tecplot.hpp"
 #include "model.hpp"
-
+#include "preferences_dialog.hpp"
 
 namespace {
 
@@ -84,9 +99,9 @@ class MainWindow : public QMainWindow, private Ui::MainWindow {
  public:
 
   // Aliases
-  using PtrRenderer = vtkSmartPointer<vtkRenderer>;
-  using PtrActor = vtkSmartPointer<vtkActor>;
-  using PtrTrackballInteractor = vtkSmartPointer<TrackballInteractor>;
+  //using PtrRenderer = vtkSmartPointer<vtkRenderer>;
+  //using PtrActor = vtkSmartPointer<vtkActor>;
+  //using PtrTrackballInteractor = vtkSmartPointer<TrackballInteractor>;
 
   MainWindow();
   ~MainWindow() override = default;
@@ -125,7 +140,7 @@ class MainWindow : public QMainWindow, private Ui::MainWindow {
   QRegularExpression _regex_int{R"([0-9]+)"};
   QRegularExpressionValidator _int_validator{_regex_int};
 
-  PtrRenderer _renderer;
+  vtkSmartPointer<vtkRenderer> _renderer;
 
   vtkSmartPointer<vtkPlaneSource> _plane_source;
   vtkSmartPointer<vtkPolyDataMapper> _plane_poly_data_mapper;
@@ -135,7 +150,7 @@ class MainWindow : public QMainWindow, private Ui::MainWindow {
   vtkSmartPointer<vtkActor> _plane_point1_actor;
   vtkSmartPointer<vtkActor> _plane_point2_actor;
 
-  PtrTrackballInteractor _interactor;
+  vtkSmartPointer<TrackballInteractor> _interactor;
 
   bool _model_ugrid_actor_showing{false};
   bool _model_arrow_actor_showing{false};

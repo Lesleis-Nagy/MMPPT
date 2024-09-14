@@ -10,6 +10,7 @@
 #include <sstream>
 #include <unordered_set>
 #include <utility>
+#include <optional>
 
 #include <vtkActor.h>
 #include <vtkArrayCalculator.h>
