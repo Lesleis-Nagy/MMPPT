@@ -29,8 +29,10 @@
 #include <vtkUnstructuredGrid.h>
 
 #include "aliases.hpp"
+#include "config_consts.h"
 #include "field.hpp"
 #include "mesh.hpp"
+#include "palettes.hpp"
 
 /**
  * A model consists of a mesh and a field.
@@ -213,6 +215,9 @@ class Model {
 
   void
   setup_arrows();
+
+  void
+  setup_arrow_color_lookup_table(const std::string &name, double val_min, double val_max);
 
 };
 

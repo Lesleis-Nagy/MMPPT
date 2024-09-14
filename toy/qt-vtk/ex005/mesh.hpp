@@ -5,6 +5,8 @@
 #ifndef MMPPT_TOY_QT_VTK_EX005_MESH_HPP_
 #define MMPPT_TOY_QT_VTK_EX005_MESH_HPP_
 
+#include <QSettings>
+
 #include <algorithm>
 #include <array>
 #include <functional>

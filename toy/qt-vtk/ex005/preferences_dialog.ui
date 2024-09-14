@@ -33,25 +33,25 @@
           <enum>QFrame::Shadow::Raised</enum>
          </property>
          <layout class="QGridLayout" name="gridLayout">
-          <item row="1" column="0">
-           <widget class="QLabel" name="_lbl_ny">
-            <property name="text">
-             <string>ny:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="QLineEdit" name="_txt_ny"/>
-          </item>
           <item row="0" column="0">
            <widget class="QLabel" name="_lbl_nx">
             <property name="text">
              <string>nx:</string>
             </property>
+            <property name="alignment">
+             <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+            </property>
            </widget>
           </item>
-          <item row="0" column="1">
-           <widget class="QLineEdit" name="_txt_nx"/>
+          <item row="1" column="0">
+           <widget class="QLabel" name="_lbl_ny">
+            <property name="text">
+             <string>ny:</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+            </property>
+           </widget>
           </item>
           <item row="0" column="2">
            <spacer name="_spc1">
@@ -66,6 +66,12 @@
             </property>
            </spacer>
           </item>
+          <item row="0" column="1">
+           <widget class="QLineEdit" name="_txt_nx"/>
+          </item>
+          <item row="1" column="1">
+           <widget class="QLineEdit" name="_txt_ny"/>
+          </item>
           <item row="1" column="2">
            <spacer name="_spc2">
             <property name="orientation">
@@ -78,6 +84,19 @@
              </size>
             </property>
            </spacer>
+          </item>
+          <item row="2" column="1">
+           <widget class="QComboBox" name="_cbo_geom_color_scheme"/>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="_lbl_geom_color_scheme">
+            <property name="text">
+             <string>color scheme:</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+            </property>
+           </widget>
           </item>
          </layout>
         </widget>
@@ -193,9 +212,16 @@
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout">
       <item>
-       <widget class="QPushButton" name="_btn_close">
+       <widget class="QPushButton" name="_btn_discard">
         <property name="text">
-         <string>Close</string>
+         <string>discard</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="_btn_close_and_save">
+        <property name="text">
+         <string>close and save</string>
         </property>
        </widget>
       </item>

@@ -24,4 +24,6 @@
 #define CONFIG_PLANE_DEFAULT_UP_Y "plane_up_default_y"
 #define CONFIG_PLANE_DEFAULT_UP_Z "plane_up_default_z"
 
+#define CONFIG_CURRENT_GEOMETRY_COLOR_SCHEME "geometry_color_scheme"
+
 #endif //MMPPT_TOY_QT_VTK_EX005_CONFIG_CONSTS_H_

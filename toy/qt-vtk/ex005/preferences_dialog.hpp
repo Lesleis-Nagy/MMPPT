@@ -13,6 +13,7 @@
 #include <QSettings>
 
 #include "config_consts.h"
+#include "palettes.hpp"
 
  class PreferencesDialog : public QDialog, private Ui::PreferencesDialog {
 
@@ -25,7 +26,8 @@
 
  public slots:
 
-  void slot_btn_close_clicked();
+  void slot_btn_close_and_save_clicked();
+  void slot_btn_discard_clicked();
 
  private:
 

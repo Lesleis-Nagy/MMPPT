@@ -145,6 +145,8 @@ Model::set_arrow_scale(double scale) {
   _arrow_glyph->SetScaleFactor(scale * length_scale());
 }
 
+
+
 //--------------------------------------------------------------------------
 // Private functions.
 //--------------------------------------------------------------------------
@@ -343,6 +345,10 @@ Model::setup_ugrid_calculations(int index) {
 void
 Model::setup_arrows() {
 
+  QSettings settings;
+  double val_min = -1.0;
+  double val_max = 1.0;
+
   _arrow_source = vtkArrowSource::New();
   _arrow_source->SetShaftResolution(_arrow_shaft_resolution);
   _arrow_source->SetTipResolution(_arrow_tip_resolution);
@@ -365,24 +371,63 @@ Model::setup_arrows() {
   _arrow_glyph->SetScaleFactor(_arrow_scale);
   _arrow_glyph->Update();
 
-  _arrow_colour_lookup_table = vtkLookupTable::New();
-  _arrow_colour_lookup_table->SetNumberOfColors(256);
-  //_arrow_colour_lookup_table->SetHueRange(0.0, 1.0);
-  _arrow_colour_lookup_table->SetTableRange(-1.0, 1.0);
-  _arrow_colour_lookup_table->SetHueRange(0.0, 1.0);;
-  _arrow_colour_lookup_table->SetSaturationRange(1.0, 1.0);
-  _arrow_colour_lookup_table->SetValueRange(1.0, 1.0);
-  _arrow_colour_lookup_table->Build();
-
   _arrow_glyph_poly_data_mapper = vtkPolyDataMapper::New();
   _arrow_glyph_poly_data_mapper->SetInputConnection(
       _arrow_glyph->GetOutputPort()
   );
+
+  setup_arrow_color_lookup_table(
+      settings.value(CONFIG_CURRENT_GEOMETRY_COLOR_SCHEME, "accent")
+          .toString()
+          .toStdString(),
+      val_min, val_max
+  );
+
+  _arrow_glyph_poly_data_mapper->SetScalarVisibility(true);
+  _arrow_glyph_poly_data_mapper->SetColorModeToMapScalars();
   _arrow_glyph_poly_data_mapper->SetLookupTable(_arrow_colour_lookup_table);
-  _arrow_glyph_poly_data_mapper->SetScalarRange(-1.0, 1.0);
+  _arrow_glyph_poly_data_mapper->UseLookupTableScalarRangeOn();
+  //_arrow_glyph_poly_data_mapper->SetScalarRange(val_min, val_max);
   _arrow_glyph_poly_data_mapper->Update();
 
   _arrow_actor = vtkActor::New();
   _arrow_actor->SetMapper(_arrow_glyph_poly_data_mapper);
+
+}
+
+void
+Model::setup_arrow_color_lookup_table(const std::string &name,
+                                      double val_min,
+                                      double val_max) {
+
+  if (colormap::palettes.find(name) == colormap::palettes.end()) {
+    return;
+  }
+
+  auto color_fn = colormap::palettes.at(name).rescale(val_min, val_max);
+
+  vtkIdType n = 256;
+  double dval = (val_max - val_min) / (double) (n - 1);
+
+  _arrow_colour_lookup_table = vtkLookupTable::New();
+  _arrow_colour_lookup_table->SetTableRange(val_min, val_max);
+  _arrow_colour_lookup_table->SetNumberOfTableValues(n);
+
+  for (vtkIdType i = 0; i < n; ++i) {
+    double val = val_min + (double) i * dval;
+    auto color = color_fn(val);
+    double r = (double) color.getRed().getValue() / 255.0;
+    double g = (double) color.getGreen().getValue() / 255.0;
+    double b = (double) color.getBlue().getValue() / 255.0;
+    double a = 1.0;
+    std::cout << "Setting color for val (" << val << ") => ";
+    std::cout << "r: " << r << ", ";
+    std::cout << "g: " << g << ", ";
+    std::cout << "b: " << b << ", ";
+    std::cout << "a: " << a << std::endl;
+    _arrow_colour_lookup_table->SetTableValue(i, r, g, b, a);
+  }
+
+  _arrow_colour_lookup_table->Build();
 
 }
