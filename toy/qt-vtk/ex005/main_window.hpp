@@ -25,11 +25,12 @@
 #include <vtkPlaneSource.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkProperty.h>
-#include <vtkRendererCollection.h>
-#include <vtkRenderer.h>
 #include <vtkRenderWindow.h>
+#include <vtkRenderer.h>
+#include <vtkRendererCollection.h>
 #include <vtkSmartPointer.h>
 #include <vtkSphereSource.h>
+#include <vtkTransform.h>
 
 #include "ui_main_window.h"
 
@@ -117,6 +118,8 @@ class MainWindow : public QMainWindow, private Ui::MainWindow {
   void slot_btn_camera_z_clicked();
   void slot_btn_put_plane_clicked();
   void slot_btn_remove_plane_clicked();
+  void slot_dial_plane_orientation_value_changed(int value);
+  void slot_txt_plane_orientation_value_changed(QString value);
   void slot_chk_ugrid_changed(Qt::CheckState state);
   void slot_chk_vectors_changed(Qt::CheckState state);
   void slot_sli_ugrid_opacity_changed(int value);
@@ -137,7 +140,9 @@ class MainWindow : public QMainWindow, private Ui::MainWindow {
   QAction* _preferencesAction;
   QAction* _aboutAction;
 
+  QRegularExpression _regex_float{R"([-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?)"};
   QRegularExpression _regex_int{R"([0-9]+)"};
+  QRegularExpressionValidator _float_validator{_regex_int};
   QRegularExpressionValidator _int_validator{_regex_int};
 
   vtkSmartPointer<vtkRenderer> _renderer;
@@ -146,8 +151,16 @@ class MainWindow : public QMainWindow, private Ui::MainWindow {
   vtkSmartPointer<vtkPolyDataMapper> _plane_poly_data_mapper;
   vtkSmartPointer<vtkActor> _plane_actor;
 
+  vtkSmartPointer<vtkSphereSource> _plane_origin_sphere_source;
+  vtkSmartPointer<vtkPolyDataMapper> _plane_origin_data_mapper;
   vtkSmartPointer<vtkActor> _plane_origin_actor;
+
+  vtkSmartPointer<vtkSphereSource> _plane_point1_sphere_source;
+  vtkSmartPointer<vtkPolyDataMapper> _plane_point1_data_mapper;
   vtkSmartPointer<vtkActor> _plane_point1_actor;
+
+  vtkSmartPointer<vtkSphereSource> _plane_point2_sphere_source;
+  vtkSmartPointer<vtkPolyDataMapper> _plane_point2_data_mapper;
   vtkSmartPointer<vtkActor> _plane_point2_actor;
 
   vtkSmartPointer<TrackballInteractor> _interactor;
@@ -157,6 +170,12 @@ class MainWindow : public QMainWindow, private Ui::MainWindow {
   std::optional<Model> _model;
 
   //--------------------------------------------------------------------------
+
+  [[nodiscard]] bool
+  is_float(const QString &str) const;
+
+  [[nodiscard]] bool
+  is_int(const QString &str) const;
 
   void
   clear_model();
@@ -190,6 +209,54 @@ class MainWindow : public QMainWindow, private Ui::MainWindow {
 
   void
   set_camera_to_z_pos();
+
+  [[nodiscard]] std::optional<vtkVector3d>
+  plane_position_from_model() const;
+
+  [[nodiscard]] std::optional<vtkVector3d>
+  plane_target_from_model() const;
+
+  [[nodiscard]] std::optional<double>
+  plane_width_from_model() const;
+
+  [[nodiscard]] std::optional<double>
+  plane_orientation_from_model() const;
+
+  [[nodiscard]] std::optional<vtkVector3d>
+  plane_position_from_gui() const;
+
+  [[nodiscard]] std::optional<vtkVector3d>
+  plane_target_from_gui() const;
+
+  [[nodiscard]] std::optional<double>
+  plane_width_from_gui() const;
+
+  [[nodiscard]] std::optional<double>
+  plane_orientation_from_gui() const;
+
+  void
+  populate_plane_parameters();
+
+  void
+  remove_plane();
+
+  void
+  remove_plane_points();
+
+  void
+  put_plane();
+
+  void
+  put_plane_points();
+
+  std::array<double, 3>
+  plane_position();
+
+  std::array<double, 3>
+  plane_normal();
+
+  std::array<double, 3>
+  plane_up();
 
 };
 

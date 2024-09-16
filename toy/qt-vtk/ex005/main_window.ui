@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1364</width>
-    <height>824</height>
+    <width>1807</width>
+    <height>1203</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -60,11 +60,11 @@
      </widget>
     </item>
     <item row="1" column="2">
-     <widget class="QFrame" name="_frm32">
+     <widget class="QFrame" name="_frm963">
       <property name="maximumSize">
        <size>
         <width>16777215</width>
-        <height>250</height>
+        <height>300</height>
        </size>
       </property>
       <property name="frameShape">
@@ -75,7 +75,7 @@
       </property>
       <layout class="QGridLayout" name="gridLayout_3">
        <item row="1" column="4">
-        <spacer name="_spc_002">
+        <spacer name="_spc002">
          <property name="orientation">
           <enum>Qt::Orientation::Horizontal</enum>
          </property>
@@ -109,7 +109,7 @@
         </widget>
        </item>
        <item row="2" column="1">
-        <spacer name="_spc4">
+        <spacer name="_spc399">
          <property name="orientation">
           <enum>Qt::Orientation::Vertical</enum>
          </property>
@@ -125,11 +125,11 @@
      </widget>
     </item>
     <item row="1" column="0" colspan="2">
-     <widget class="QFrame" name="_frame_001">
+     <widget class="QFrame" name="_frm939">
       <property name="maximumSize">
        <size>
         <width>16777215</width>
-        <height>250</height>
+        <height>500</height>
        </size>
       </property>
       <property name="frameShape">
@@ -218,7 +218,7 @@
            </widget>
           </item>
           <item row="6" column="0">
-           <spacer name="_spc3">
+           <spacer name="_spc493">
             <property name="orientation">
              <enum>Qt::Orientation::Vertical</enum>
             </property>
@@ -368,8 +368,15 @@
           <string>Sample plane</string>
          </property>
          <layout class="QGridLayout" name="gridLayout_2">
-          <item row="7" column="0">
-           <spacer name="verticalSpacer">
+          <item row="6" column="1">
+           <widget class="QPushButton" name="_btn_get_plane">
+            <property name="text">
+             <string>get plane</string>
+            </property>
+           </widget>
+          </item>
+          <item row="8" column="0">
+           <spacer name="_spc090">
             <property name="orientation">
              <enum>Qt::Orientation::Vertical</enum>
             </property>
@@ -381,14 +388,28 @@
             </property>
            </spacer>
           </item>
-          <item row="6" column="0" colspan="3">
-           <widget class="QCheckBox" name="_chk_plane_visible">
+          <item row="6" column="2">
+           <widget class="QPushButton" name="_btn_remove_plane">
             <property name="text">
-             <string>plane visible</string>
+             <string>remove plane</string>
             </property>
            </widget>
           </item>
-          <item row="4" column="0" colspan="4">
+          <item row="7" column="0" colspan="4">
+           <widget class="QCheckBox" name="_chk_show_reference_points">
+            <property name="text">
+             <string>show reference points</string>
+            </property>
+           </widget>
+          </item>
+          <item row="6" column="0">
+           <widget class="QPushButton" name="_btn_put_plane">
+            <property name="text">
+             <string>put plane</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="0" colspan="5">
            <widget class="QFrame" name="frame">
             <property name="frameShape">
              <enum>QFrame::Shape::NoFrame</enum>
@@ -409,44 +430,11 @@
              <property name="bottomMargin">
               <number>5</number>
              </property>
+             <item row="3" column="1">
+              <widget class="QLineEdit" name="_txt_plane_width"/>
+             </item>
              <item row="2" column="1">
               <widget class="QLineEdit" name="_txt_plane_tx">
-               <property name="minimumSize">
-                <size>
-                 <width>50</width>
-                 <height>0</height>
-                </size>
-               </property>
-               <property name="maximumSize">
-                <size>
-                 <width>16777215</width>
-                 <height>16777215</height>
-                </size>
-               </property>
-              </widget>
-             </item>
-             <item row="2" column="0">
-              <widget class="QLabel" name="_lbl_target">
-               <property name="text">
-                <string>target:</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="0">
-              <widget class="QLabel" name="_lbl_position">
-               <property name="text">
-                <string>position:</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="1">
-              <widget class="QLineEdit" name="_txt_plane_x">
                <property name="minimumSize">
                 <size>
                  <width>50</width>
@@ -477,8 +465,70 @@
                </property>
               </widget>
              </item>
-             <item row="2" column="4">
+             <item row="0" column="0">
+              <widget class="QLabel" name="_lbl_plane_position">
+               <property name="text">
+                <string>position:</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="0">
+              <widget class="QLabel" name="_lbl_plane_target">
+               <property name="text">
+                <string>target:</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="3">
               <widget class="QLineEdit" name="_txt_plane_tz">
+               <property name="minimumSize">
+                <size>
+                 <width>50</width>
+                 <height>0</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>16777215</width>
+                 <height>16777215</height>
+                </size>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="0">
+              <widget class="QLabel" name="_lbl_plane_width">
+               <property name="text">
+                <string>width:</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QLineEdit" name="_txt_plane_x">
+               <property name="minimumSize">
+                <size>
+                 <width>50</width>
+                 <height>0</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>16777215</width>
+                 <height>16777215</height>
+                </size>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="3">
+              <widget class="QLineEdit" name="_txt_plane_z">
                <property name="minimumSize">
                 <size>
                  <width>50</width>
@@ -509,76 +559,95 @@
                </property>
               </widget>
              </item>
-             <item row="0" column="4">
-              <widget class="QLineEdit" name="_txt_plane_z">
+             <item row="3" column="2" rowspan="2" colspan="2">
+              <widget class="QGroupBox" name="_grp_plane_orientation">
                <property name="minimumSize">
                 <size>
-                 <width>50</width>
+                 <width>0</width>
                  <height>0</height>
                 </size>
                </property>
-               <property name="maximumSize">
-                <size>
-                 <width>16777215</width>
-                 <height>16777215</height>
-                </size>
+               <property name="title">
+                <string>orientation</string>
                </property>
-              </widget>
-             </item>
-             <item row="3" column="0">
-              <widget class="QLabel" name="_lbl_up">
-               <property name="text">
-                <string>up:</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
-               </property>
-              </widget>
-             </item>
-             <item row="3" column="1">
-              <widget class="QLineEdit" name="_txt_plane_ux">
-               <property name="minimumSize">
-                <size>
-                 <width>50</width>
-                 <height>0</height>
-                </size>
-               </property>
-              </widget>
-             </item>
-             <item row="3" column="2">
-              <widget class="QLineEdit" name="_txt_plane_uy">
-               <property name="minimumSize">
-                <size>
-                 <width>50</width>
-                 <height>0</height>
-                </size>
-               </property>
-              </widget>
-             </item>
-             <item row="3" column="4">
-              <widget class="QLineEdit" name="_txt_plane_uz">
-               <property name="minimumSize">
-                <size>
-                 <width>50</width>
-                 <height>0</height>
-                </size>
-               </property>
+               <layout class="QHBoxLayout" name="horizontalLayout_3">
+                <item>
+                 <widget class="QDial" name="_dial_plane_orientation">
+                  <property name="maximum">
+                   <number>3600</number>
+                  </property>
+                  <property name="orientation">
+                   <enum>Qt::Orientation::Horizontal</enum>
+                  </property>
+                  <property name="wrapping">
+                   <bool>true</bool>
+                  </property>
+                  <property name="notchesVisible">
+                   <bool>false</bool>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QFrame" name="_frm938">
+                  <property name="frameShape">
+                   <enum>QFrame::Shape::NoFrame</enum>
+                  </property>
+                  <property name="frameShadow">
+                   <enum>QFrame::Shadow::Raised</enum>
+                  </property>
+                  <widget class="QLineEdit" name="_txt_plane_orientation">
+                   <property name="geometry">
+                    <rect>
+                     <x>1</x>
+                     <y>16</y>
+                     <width>80</width>
+                     <height>20</height>
+                    </rect>
+                   </property>
+                   <property name="minimumSize">
+                    <size>
+                     <width>80</width>
+                     <height>0</height>
+                    </size>
+                   </property>
+                   <property name="maximumSize">
+                    <size>
+                     <width>80</width>
+                     <height>16777215</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string>0</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+                   </property>
+                  </widget>
+                  <widget class="QLabel" name="_lbl_plane_orientation_unit">
+                   <property name="geometry">
+                    <rect>
+                     <x>80</x>
+                     <y>10</y>
+                     <width>20</width>
+                     <height>30</height>
+                    </rect>
+                   </property>
+                   <property name="text">
+                    <string>°</string>
+                   </property>
+                  </widget>
+                 </widget>
+                </item>
+               </layout>
               </widget>
              </item>
             </layout>
            </widget>
           </item>
-          <item row="5" column="0">
-           <widget class="QPushButton" name="_btn_put_plane">
-            <property name="text">
-             <string>put</string>
-            </property>
-           </widget>
-          </item>
-          <item row="5" column="1">
-           <widget class="QPushButton" name="_btn_remove_plane">
-            <property name="text">
-             <string>remove</string>
+          <item row="5" column="2">
+           <widget class="QSlider" name="horizontalSlider">
+            <property name="orientation">
+             <enum>Qt::Orientation::Horizontal</enum>
             </property>
            </widget>
           </item>
@@ -595,7 +664,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1364</width>
+     <width>1807</width>
      <height>24</height>
     </rect>
    </property>

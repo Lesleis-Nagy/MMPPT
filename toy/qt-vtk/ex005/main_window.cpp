@@ -5,7 +5,6 @@
 
 #include "main_window.hpp"
 
-
 MainWindow::MainWindow() {
 
   // Set up the GUI.
@@ -61,6 +60,10 @@ MainWindow::MainWindow() {
           this, SLOT(slot_btn_put_plane_clicked()));
   connect(_btn_remove_plane, SIGNAL(clicked(bool)),
           this, SLOT(slot_btn_remove_plane_clicked()));
+  connect(_dial_plane_orientation, SIGNAL(valueChanged(int)),
+          this, SLOT(slot_dial_plane_orientation_value_changed(int)));
+  connect(_txt_plane_orientation, SIGNAL(textChanged(const QString &)),
+          this, SLOT(slot_txt_plane_orientation_value_changed(QString)));
 
   connect(_chk_ugrid, SIGNAL(checkStateChanged(Qt::CheckState)),
           this, SLOT(slot_chk_ugrid_changed(Qt::CheckState)));
@@ -89,7 +92,6 @@ void
 MainWindow::slot_timer_timeout() {
 
 }
-
 
 void
 MainWindow::slot_btn_load_tecplot_clicked() {
@@ -129,6 +131,8 @@ MainWindow::slot_btn_load_tecplot_clicked() {
 
   _chk_ugrid->setCheckState(Qt::CheckState::Checked);
   _chk_vectors->setCheckState(Qt::CheckState::Checked);
+
+  populate_plane_parameters();
 
   _status_bar->showMessage(tr("Current file: ") + file_info.absoluteFilePath());
 
@@ -204,6 +208,7 @@ MainWindow::slot_btn_put_plane_clicked() {
   //       the boxes.
 
   // Set the plane _plane_actor.
+  /*
   _plane_source = vtkPlaneSource::New();
   _plane_source->SetResolution(10, 10);
   _plane_source->SetCenter(0, 0, 0);
@@ -219,7 +224,10 @@ MainWindow::slot_btn_put_plane_clicked() {
   _plane_actor->GetProperty()->LightingOff();
 
   _renderer->AddActor(_plane_actor);
+   */
 
+  put_plane();
+  put_plane_points();
 
   _vtk_widget->update();
   _vtk_widget->renderWindow()->Render();
@@ -230,6 +238,28 @@ void
 MainWindow::slot_btn_remove_plane_clicked() {
 
   std::cout << "slot_btn_remove_plane_clicked" << std::endl;
+
+}
+
+void
+MainWindow::slot_dial_plane_orientation_value_changed(int value) {
+
+  _txt_plane_orientation->setText(QString::number((double) value / 10.0));
+
+  put_plane();
+
+  _vtk_widget->update();
+  _vtk_widget->renderWindow()->Render();
+
+}
+
+void
+MainWindow::slot_txt_plane_orientation_value_changed(QString value) {
+
+  int degrees = qRound(value.toDouble() * 10.0);
+
+  _dial_plane_orientation->setValue(degrees);
+
 
 }
 
@@ -357,6 +387,20 @@ MainWindow::slot_menu_preferences() {
 
 //----------------------------------------------------------------------------
 
+bool
+MainWindow::is_float(const QString &str) const {
+
+  return _regex_float.match(str).hasMatch();
+
+}
+
+bool
+MainWindow::is_int(const QString &str) const {
+
+  return _regex_int.match(str).hasMatch();
+
+}
+
 void
 MainWindow::clear_model() {
 
@@ -473,4 +517,379 @@ MainWindow::set_camera_to_z_pos() {
     _renderer->GetActiveCamera()->SetViewUp(0, 1, 0);
   }
 
+}
+
+std::optional<vtkVector3d>
+MainWindow::plane_position_from_model() const {
+
+  if (!_model.has_value()) return std::nullopt;
+
+  auto center = _model->center();
+  auto length_scale = _model->length_scale();
+
+  return vtkVector3d{
+      center[0],
+      center[1],
+      center[2] - length_scale
+  };
+
+}
+
+std::optional<vtkVector3d>
+MainWindow::plane_target_from_model() const {
+
+  if (!_model.has_value()) return std::nullopt;
+
+  auto center = _model->center();
+
+  return vtkVector3d{
+      center[0],
+      center[1],
+      center[2]
+  };
+
+}
+
+std::optional<double>
+MainWindow::plane_orientation_from_model() const {
+
+  if (!_model.has_value()) return std::nullopt;
+
+  return 0.0;
+
+}
+
+std::optional<double>
+MainWindow::plane_width_from_model() const {
+
+  if (!_model.has_value()) return std::nullopt;
+
+  return _model->length_scale();
+
+}
+
+std::optional<vtkVector3d>
+MainWindow::plane_position_from_gui() const {
+
+  if (is_float(_txt_plane_x->text())
+      && is_float(_txt_plane_y->text())
+      && is_float(_txt_plane_z->text())) {
+
+    return vtkVector3d {
+      _txt_plane_x->text().toDouble(),
+      _txt_plane_y->text().toDouble(),
+      _txt_plane_z->text().toDouble()
+    };
+
+  }
+
+  return std::nullopt;
+
+}
+
+std::optional<vtkVector3d>
+MainWindow::plane_target_from_gui() const {
+
+  if (is_float(_txt_plane_tx->text())
+      && is_float(_txt_plane_ty->text())
+      && is_float(_txt_plane_tz->text())) {
+
+    return vtkVector3d {
+        _txt_plane_tx->text().toDouble(),
+        _txt_plane_ty->text().toDouble(),
+        _txt_plane_tz->text().toDouble()
+    };
+
+  }
+
+  return std::nullopt;
+
+}
+
+std::optional<double>
+MainWindow::plane_orientation_from_gui() const {
+
+  if (is_float(_txt_plane_orientation->text())) {
+
+    return _txt_plane_orientation->text().toDouble();
+
+  }
+
+  return std::nullopt;
+
+}
+
+std::optional<double>
+MainWindow::plane_width_from_gui() const {
+
+  if (is_float(_txt_plane_width->text())) {
+
+    return _txt_plane_width->text().toDouble();
+
+  }
+
+  return std::nullopt;
+
+}
+
+void
+MainWindow::populate_plane_parameters() {
+
+  if (!_model.has_value()) return;
+
+  auto p_pos = plane_position_from_model().value();
+  auto p_trg = plane_target_from_model().value();
+  auto p_width = plane_width_from_model().value();
+  auto p_orientation = plane_orientation_from_model().value();
+
+  _txt_plane_x->setText(QString::number(p_pos.GetX()));
+  _txt_plane_y->setText(QString::number(p_pos.GetY()));
+  _txt_plane_z->setText(QString::number(p_pos.GetZ()));
+
+  _txt_plane_tx->setText(QString::number(p_trg.GetX()));
+  _txt_plane_ty->setText(QString::number(p_trg.GetY()));
+  _txt_plane_tz->setText(QString::number(p_trg.GetZ()));
+
+  _txt_plane_orientation->setText(QString::number(p_orientation));
+  _txt_plane_width->setText(QString::number(p_width));
+
+}
+
+void
+MainWindow::remove_plane() {
+
+  if (_plane_actor != nullptr) {
+    _renderer->RemoveActor(_plane_actor);
+
+    _plane_actor->Delete();
+    _plane_poly_data_mapper->Delete();
+    _plane_source->Delete();
+
+    _plane_actor = nullptr;
+    _plane_poly_data_mapper = nullptr;
+    _plane_source = nullptr;
+
+  }
+
+}
+
+void
+MainWindow::remove_plane_points() {
+
+  if (_plane_origin_actor != nullptr) {
+
+    _renderer->RemoveActor(_plane_origin_actor);
+
+    _plane_origin_actor->Delete();
+    _plane_origin_data_mapper->Delete();
+    _plane_origin_sphere_source->Delete();
+
+    _plane_origin_actor = nullptr;
+    _plane_origin_data_mapper = nullptr;
+    _plane_origin_sphere_source = nullptr;
+
+  }
+
+  if (_plane_point1_actor != nullptr) {
+
+    _renderer->RemoveActor(_plane_point1_actor);
+
+    _plane_point1_actor->Delete();
+    _plane_point1_data_mapper->Delete();
+    _plane_point1_sphere_source->Delete();
+
+    _plane_point1_actor = nullptr;
+    _plane_point1_data_mapper = nullptr;
+    _plane_point1_sphere_source = nullptr;
+
+  }
+
+  if (_plane_point2_actor != nullptr) {
+
+    _renderer->RemoveActor(_plane_point2_actor);
+
+    _plane_point2_actor->Delete();
+    _plane_point2_data_mapper->Delete();
+    _plane_point2_sphere_source->Delete();
+
+    _plane_point2_actor = nullptr;
+    _plane_point2_data_mapper = nullptr;
+    _plane_point2_sphere_source = nullptr;
+
+  }
+
+}
+
+void
+MainWindow::put_plane() {
+
+  remove_plane();
+
+  auto p_pos = plane_position_from_gui();
+  if (!p_pos.has_value()) return;
+
+  auto p_trg = plane_target_from_model();
+  if (!p_trg.has_value()) return;
+
+  auto p_width = plane_width_from_gui();
+  if (!p_width.has_value()) return;
+
+  auto p_orientation = plane_orientation_from_gui();
+  if (!p_orientation.has_value()) return;
+
+  vtkVector3d planeI = {1.0, 0.0, 0.0};
+  vtkVector3d planeJ = {0.0, 1.0, 0.0};
+  vtkVector3d planeK = {0.0, 0.0, 1.0};
+
+  vtkVector3d d = (p_trg.value() - p_pos.value()).Normalized();
+
+  vtkVector3d rAxis = planeK.Cross(d);
+  double rAngle = acos(planeK.Dot(d));
+
+  std::cout << "rAxis:  " << rAxis.GetX() << ", " << rAxis.GetY() << ", " << rAxis.GetZ() << std::endl;
+  std::cout << "rAngle: " << rAngle << std::endl;
+
+  vtkSmartPointer<vtkTransform> position = vtkTransform::New();
+  position->Translate(p_pos->GetX(), p_pos->GetY(), p_pos->GetZ());
+
+  vtkSmartPointer<vtkTransform> rMatrix = vtkTransform::New();
+  rMatrix->RotateWXYZ(rAngle * 180 / M_PI, rAxis.GetX(), rAxis.GetY(), rAxis.GetZ());
+
+  vtkSmartPointer<vtkTransform> rOriMatrix = vtkTransform::New();
+  rOriMatrix->RotateWXYZ(p_orientation.value(), d.GetX(), d.GetY(), d.GetZ());
+
+  // Create a vtkTransform to apply the transformations
+  vtkSmartPointer<vtkTransform> transform = position;
+  transform->Concatenate(rOriMatrix);
+  transform->Concatenate(rMatrix);
+
+  _plane_source = vtkPlaneSource::New();
+  _plane_source->SetNormal(0.0, 0.0, -1.0);
+  _plane_source->SetResolution(10, 10);
+  _plane_source->Update();
+
+  _plane_poly_data_mapper = vtkPolyDataMapper::New();
+  _plane_poly_data_mapper->SetInputData(_plane_source->GetOutput());
+
+  _plane_actor = vtkActor::New();
+  _plane_actor->SetMapper(_plane_poly_data_mapper);
+  _plane_actor->SetScale(p_width.value());
+  //_plane_actor->SetPosition(p_pos->GetX(), p_pos->GetY(), p_pos->GetZ());
+  _plane_actor->SetUserTransform(transform);
+  _plane_actor->GetProperty()->SetColor(1, 1, 1);
+  _plane_actor->GetProperty()->LightingOff();
+
+  _renderer->AddActor(_plane_actor);
+
+}
+
+void
+MainWindow::put_plane_points() {
+
+  remove_plane_points();
+
+  /*
+  auto p_pos = plane_position_from_gui();
+  if (!p_pos.has_value()) return;
+
+  auto p_trg = plane_target_from_model();
+  if (!p_trg.has_value()) return;
+
+  auto p_width = plane_width_from_gui();
+  if (!p_width.has_value()) return;
+
+  auto p_norm = (p_trg.value() - p_pos.value()).Normalized();
+
+  auto e2 = p_up->Normalized();
+  auto e1 = e2.Cross(p_norm);
+
+  vtkVector3d pt1 {
+      p_width.value() * e1.GetX() + p_pos->GetX(),
+      p_width.value() * e1.GetY() + p_pos->GetY(),
+      p_width.value() * e1.GetZ() + p_pos->GetZ()
+  };
+
+  vtkVector3d pt2 {
+      p_width.value() * e2.GetX() + p_pos->GetX(),
+      p_width.value() * e2.GetY() + p_pos->GetY(),
+      p_width.value() * e2.GetZ() + p_pos->GetZ()
+  };
+
+  std::cout << "Putting plane points:" << std::endl;
+  std::cout << "  plane center: " << p_pos->GetX() << ", " << p_pos->GetY() << ", " << p_pos->GetZ() << std::endl;
+  std::cout << "  point 1     : " << pt1.GetX() << ", " << pt1.GetY() << ", " << pt1.GetZ() << std::endl;
+  std::cout << "  point 2     : " << pt2.GetX() << ", " << pt2.GetY() << ", " << pt2.GetZ() << std::endl;
+
+  _plane_origin_sphere_source = vtkSphereSource::New();
+  _plane_origin_sphere_source->SetPhiResolution(30);
+  _plane_origin_sphere_source->SetThetaResolution(30);
+  _plane_origin_sphere_source->SetRadius(0.1 * p_width.value());
+  _plane_origin_sphere_source->Update();
+
+  _plane_origin_data_mapper = vtkPolyDataMapper::New();
+  _plane_origin_data_mapper->SetInputData(_plane_origin_sphere_source->GetOutput());
+
+  _plane_origin_actor = vtkActor::New();
+  _plane_origin_actor->SetMapper(_plane_origin_data_mapper);
+  _plane_origin_actor->SetPosition(p_pos->GetX(), p_pos->GetY(), p_pos->GetZ());
+  _plane_origin_actor->GetProperty()->SetColor(1.0, 0.0, 0.0);
+
+
+
+
+  _plane_point1_sphere_source = vtkSphereSource::New();
+  _plane_point1_sphere_source->SetPhiResolution(30);
+  _plane_point1_sphere_source->SetThetaResolution(30);
+  _plane_point1_sphere_source->SetRadius(0.1 * p_width.value());
+  _plane_point1_sphere_source->Update();
+
+  _plane_point1_data_mapper = vtkPolyDataMapper::New();
+  _plane_point1_data_mapper->SetInputData(_plane_point1_sphere_source->GetOutput());
+
+  _plane_point1_actor = vtkActor::New();
+  _plane_point1_actor->SetMapper(_plane_point1_data_mapper);
+  _plane_point1_actor->SetPosition(pt1.GetX(), pt1.GetY(), pt1.GetZ());
+  _plane_point1_actor->GetProperty()->SetColor(0.0, 1.0, 0.0);
+
+
+
+
+  _plane_point2_sphere_source = vtkSphereSource::New();
+  _plane_point2_sphere_source->SetPhiResolution(30);
+  _plane_point2_sphere_source->SetThetaResolution(30);
+  _plane_point2_sphere_source->SetRadius(0.1 * p_width.value());
+  _plane_point2_sphere_source->Update();
+
+  _plane_point2_data_mapper = vtkPolyDataMapper::New();
+  _plane_point2_data_mapper->SetInputData(_plane_point2_sphere_source->GetOutput());
+
+  _plane_point2_actor = vtkActor::New();
+  _plane_point2_actor->SetMapper(_plane_point2_data_mapper);
+  _plane_point2_actor->SetPosition(pt2.GetX(), pt2.GetY(), pt2.GetZ());
+  _plane_point2_actor->GetProperty()->SetColor(0.0, 0.0, 1.0);
+
+
+
+
+  _renderer->AddActor(_plane_origin_actor);
+  _renderer->AddActor(_plane_point1_actor);
+  _renderer->AddActor(_plane_point2_actor);
+  _renderer->ResetCamera();
+   */
+
+}
+
+std::array<double, 3>
+MainWindow::plane_position() {
+  return {0, 0, 0};
+}
+
+std::array<double, 3>
+MainWindow::plane_normal() {
+  return {0, 0, 0};
+}
+
+std::array<double, 3>
+MainWindow::plane_up() {
+  return {0, 0, 0};
 }
