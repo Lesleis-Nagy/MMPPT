@@ -110,20 +110,32 @@ class MainWindow : public QMainWindow, private Ui::MainWindow {
  public slots:
 
   void slot_timer_timeout();
+
   void slot_btn_load_tecplot_clicked();
   void slot_btn_clear_clicked();
   void slot_btn_set_arrow_scale_clicked();
   void slot_btn_camera_x_clicked();
   void slot_btn_camera_y_clicked();
   void slot_btn_camera_z_clicked();
-  void slot_btn_put_plane_clicked();
-  void slot_btn_remove_plane_clicked();
-  void slot_dial_plane_orientation_value_changed(int value);
-  void slot_txt_plane_orientation_value_changed(QString value);
   void slot_chk_ugrid_changed(Qt::CheckState state);
   void slot_chk_vectors_changed(Qt::CheckState state);
   void slot_sli_ugrid_opacity_changed(int value);
   void slot_sli_vector_opacity_changed(int value);
+
+  void slot_sli_plane_polar_angle_changed(int value);
+  void slot_txt_plane_polar_angle_changed(QString value);
+  void slot_sli_plane_azimuthal_angle_changed(int value);
+  void slot_txt_plane_azimuthal_angle_changed(QString value);
+  void slot_sli_plane_orientation_angle_changed(int value);
+  void slot_txt_plane_orientation_angle_changed(QString value);
+  void slot_txt_plane_target_x_changed(QString value);
+  void slot_txt_plane_target_y_changed(QString value);
+  void slot_txt_plane_target_z_changed(QString value);
+  void slot_txt_plane_width_changed(QString value);
+  void slot_txt_plane_distance_changed(QString value);
+  void slot_chk_plane_show_reference_points_changed(Qt::CheckState value);
+  void slot_chk_plane_hide_plane_changed(Qt::CheckState value);
+
 
   void slot_btn_mfm_clicked();
   void slot_btn_holography_clicked();
@@ -228,17 +240,29 @@ class MainWindow : public QMainWindow, private Ui::MainWindow {
   [[nodiscard]] std::optional<vtkVector3d>
   plane_target_from_gui() const;
 
+  [[nodiscard]] double
+  plane_azimuth_from_gui() const;
+
+  [[nodiscard]] double
+  plane_polar_from_gui() const;
+
+  [[nodiscard]] double
+  plane_orientation_from_gui() const;
+
   [[nodiscard]] std::optional<double>
   plane_width_from_gui() const;
 
   [[nodiscard]] std::optional<double>
-  plane_orientation_from_gui() const;
+  plane_distance_from_gui() const;
 
   void
-  populate_plane_parameters();
+  initialize_gui_plane_parameters_from_model();
 
   void
   remove_plane();
+
+  void
+  hide_plane();
 
   void
   remove_plane_points();
