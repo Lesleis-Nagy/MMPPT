@@ -43,7 +43,7 @@ find_package(HDF5 REQUIRED)
 # Find SQLite                                                                 #
 #-----------------------------------------------------------------------------#
 
-find_package(SQLite3 REQUIRED)
+#find_package(SQLite3 REQUIRED)
 
 #-----------------------------------------------------------------------------#
 # Build third-party libraries.                                                #

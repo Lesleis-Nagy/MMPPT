@@ -159,13 +159,9 @@ class MainWindow : public QMainWindow, private Ui::MainWindow {
 
   vtkSmartPointer<vtkRenderer> _renderer;
 
-  vtkSmartPointer<vtkPlaneSource> _plane_source;
-  vtkSmartPointer<vtkPolyDataMapper> _plane_poly_data_mapper;
-  vtkSmartPointer<vtkActor> _plane_actor;
-
-  vtkSmartPointer<vtkSphereSource> _plane_origin_sphere_source;
-  vtkSmartPointer<vtkPolyDataMapper> _plane_origin_data_mapper;
-  vtkSmartPointer<vtkActor> _plane_origin_actor;
+  vtkSmartPointer<vtkSphereSource> _sample_point1_source;
+  vtkSmartPointer<vtkPolyDataMapper> _sample_point1_data_mapper;
+  vtkSmartPointer<vtkActor> _sample_point1_actor;
 
   vtkSmartPointer<vtkSphereSource> _plane_point1_sphere_source;
   vtkSmartPointer<vtkPolyDataMapper> _plane_point1_data_mapper;
@@ -258,29 +254,56 @@ class MainWindow : public QMainWindow, private Ui::MainWindow {
   void
   initialize_gui_plane_parameters_from_model();
 
+  bool
+  have_plane_objects();
+
+  bool
+  is_plane_hidden();
+
+  void
+  create_plane();
+
   void
   remove_plane();
 
   void
+  draw_plane();
+
+  void
   hide_plane();
+
+  bool
+  have_plane_point_objects();
+
+  bool
+  are_plane_points_hidden();
+
+  void
+  create_plane_points();
 
   void
   remove_plane_points();
 
   void
-  put_plane();
+  draw_plane_points();
 
   void
-  put_plane_points();
+  hide_plane_points();
 
-  std::array<double, 3>
-  plane_position();
+  bool
+  have_plane_center_point_objects();
 
-  std::array<double, 3>
-  plane_normal();
+  void
+  create_plane_center_point();
 
-  std::array<double, 3>
-  plane_up();
+  void
+  remove_plane_center_point();
+
+  void
+  draw_plane_center_point();
+
+  void
+  hide_plane_center_point();
 
 };
 

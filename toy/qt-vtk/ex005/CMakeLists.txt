@@ -5,6 +5,7 @@ qt_add_executable(${EXE_NAME}
         main_window.cpp
         preferences_dialog.ui
         preferences_dialog.cpp
+        sample_plane.cpp
         pixel_widget.cpp
         model.cpp
         main.cpp
