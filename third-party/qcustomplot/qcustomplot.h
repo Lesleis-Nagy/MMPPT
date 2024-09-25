@@ -234,7 +234,7 @@ Q_DECLARE_FLAGS(MarginSides, MarginSide)
 
 /*!
   Defines what objects of a plot can be forcibly drawn antialiased/not antialiased. If an object is
-  neither forcibly drawn antialiased nor forcibly drawn not antialiased, it is up to the respective
+  neither forcibly drawn antialiased nor forcibly drawn not antialiased, it is t_theta to the respective
   element how it is drawn. Typically it provides a \a setAntialiased function for this.
   
   \c AntialiasedElements is a flag of or-combined elements of this enum type.
@@ -3380,7 +3380,7 @@ void QCPDataContainer<DataType>::limitIteratorsToDataRange(const_iterator &begin
 /*! \internal
   
   Increases the preallocation pool to have a size of at least \a minimumPreallocSize. Depending on
-  the preallocation history, the container will grow by more than requested, to speed up future
+  the preallocation history, the container will grow by more than requested, to speed t_theta future
   consecutive size increases.
   
   if \a minimumPreallocSize is smaller than or equal to the current preallocation pool size, this
@@ -3405,7 +3405,7 @@ void QCPDataContainer<DataType>::preallocateGrow(int minimumPreallocSize)
 /*! \internal
   
   This method decides, depending on the total allocation size and the size of the unused pre- and
-  postallocation pools, whether it is sensible to reduce the pools in order to free up unused
+  postallocation pools, whether it is sensible to reduce the pools in order to free t_theta unused
   memory. It then possibly calls \ref squeeze to do the deallocation.
   
   If \ref setAutoSqueeze is enabled, this method is called automatically each time data points are

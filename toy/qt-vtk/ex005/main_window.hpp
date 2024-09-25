@@ -38,6 +38,7 @@
 #include "load_tecplot.hpp"
 #include "model.hpp"
 #include "preferences_dialog.hpp"
+#include "sample_plane.hpp"
 
 namespace {
 
@@ -159,23 +160,13 @@ class MainWindow : public QMainWindow, private Ui::MainWindow {
 
   vtkSmartPointer<vtkRenderer> _renderer;
 
-  vtkSmartPointer<vtkSphereSource> _sample_point1_source;
-  vtkSmartPointer<vtkPolyDataMapper> _sample_point1_data_mapper;
-  vtkSmartPointer<vtkActor> _sample_point1_actor;
-
-  vtkSmartPointer<vtkSphereSource> _plane_point1_sphere_source;
-  vtkSmartPointer<vtkPolyDataMapper> _plane_point1_data_mapper;
-  vtkSmartPointer<vtkActor> _plane_point1_actor;
-
-  vtkSmartPointer<vtkSphereSource> _plane_point2_sphere_source;
-  vtkSmartPointer<vtkPolyDataMapper> _plane_point2_data_mapper;
-  vtkSmartPointer<vtkActor> _plane_point2_actor;
-
   vtkSmartPointer<TrackballInteractor> _interactor;
 
   bool _model_ugrid_actor_showing{false};
   bool _model_arrow_actor_showing{false};
+
   std::optional<Model> _model;
+  std::optional<SamplePlane> _sample_plane;
 
   //--------------------------------------------------------------------------
 
@@ -218,35 +209,29 @@ class MainWindow : public QMainWindow, private Ui::MainWindow {
   void
   set_camera_to_z_pos();
 
-  [[nodiscard]] std::optional<vtkVector3d>
-  plane_position_from_model() const;
+  [[nodiscard]] double
+  plane_polar_angle_from_gui() const;
 
-  [[nodiscard]] std::optional<vtkVector3d>
-  plane_target_from_model() const;
+  [[nodiscard]] double
+  plane_azimuthal_angle_from_gui() const;
+
+  [[nodiscard]] double
+  plane_orientation_angle_from_gui() const;
 
   [[nodiscard]] std::optional<double>
-  plane_width_from_model() const;
+  plane_target_x_from_gui() const;
 
   [[nodiscard]] std::optional<double>
-  plane_orientation_from_model() const;
+  plane_target_y_from_gui() const;
 
-  [[nodiscard]] std::optional<vtkVector3d>
-  plane_position_from_gui() const;
-
-  [[nodiscard]] std::optional<vtkVector3d>
-  plane_target_from_gui() const;
-
-  [[nodiscard]] double
-  plane_azimuth_from_gui() const;
-
-  [[nodiscard]] double
-  plane_polar_from_gui() const;
-
-  [[nodiscard]] double
-  plane_orientation_from_gui() const;
+  [[nodiscard]] std::optional<double>
+  plane_target_z_from_gui() const;
 
   [[nodiscard]] std::optional<double>
   plane_width_from_gui() const;
+
+  [[nodiscard]] std::optional<double>
+  plane_height_from_gui() const;
 
   [[nodiscard]] std::optional<double>
   plane_distance_from_gui() const;
@@ -255,55 +240,13 @@ class MainWindow : public QMainWindow, private Ui::MainWindow {
   initialize_gui_plane_parameters_from_model();
 
   bool
-  have_plane_objects();
-
-  bool
   is_plane_hidden();
-
-  void
-  create_plane();
-
-  void
-  remove_plane();
-
-  void
-  draw_plane();
 
   void
   hide_plane();
 
-  bool
-  have_plane_point_objects();
-
-  bool
-  are_plane_points_hidden();
-
   void
-  create_plane_points();
-
-  void
-  remove_plane_points();
-
-  void
-  draw_plane_points();
-
-  void
-  hide_plane_points();
-
-  bool
-  have_plane_center_point_objects();
-
-  void
-  create_plane_center_point();
-
-  void
-  remove_plane_center_point();
-
-  void
-  draw_plane_center_point();
-
-  void
-  hide_plane_center_point();
+  show_plane();
 
 };
 

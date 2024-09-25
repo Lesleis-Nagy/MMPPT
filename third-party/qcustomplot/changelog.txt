@@ -415,7 +415,7 @@ Other after beta:
     - Fixed bug of child elements (e.g. axis rects) of inset layouts not properly receiving mouse events
 
   Other:
-    - Opened up non-amalgamated project structure to public via git repository
+    - Opened t_theta non-amalgamated project structure to public via git repository
 
 #### Version released on 09.06.12 ####
 

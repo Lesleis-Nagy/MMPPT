@@ -890,6 +890,26 @@ T trace(const Matrix3x3<T> &m) {
 
 }
 
+template<typename T>
+Matrix3x3<T> rotation(T gamma, const Vector3D<T> &axis) {
+
+  auto naxis = normalised(axis);
+
+  return {{pow(naxis.x(), 2) * (1 - cos(gamma)) + cos(gamma),
+           naxis.x() * naxis.y() * (1 - cos(gamma)) - naxis.z() * sin(gamma),
+           naxis.x() * naxis.z() * (1 - cos(gamma)) + naxis.y() * sin(gamma)},
+
+          {naxis.x() * naxis.y() * (1 - cos(gamma)) + naxis.z() * sin(gamma),
+           pow(naxis.y(), 2) * (1 - cos(gamma)) + cos(gamma),
+           naxis.y() * naxis.z() * (1 - cos(gamma)) - naxis.x() * sin(gamma)},
+
+          {naxis.x() * naxis.z() * (1 - cos(gamma)) - naxis.y() * sin(gamma),
+           naxis.y() * naxis.z() * (1 - cos(gamma)) + naxis.x() * sin(gamma),
+           pow(naxis.z(), 2) * (1 - cos(gamma)) + cos(gamma)}
+  };
+
+}
+
 //---------------------------------------------------------------------------//
 // 4x4 Matrix                                                                //
 //---------------------------------------------------------------------------//
@@ -1371,6 +1391,37 @@ Vector4D<T> diag(const Matrix4x4<T> &m) {
 
 }
 
+
+template<typename T>
+Matrix4x4<T> rotation(T gamma, const Vector4D<T> &axis) {
+
+  auto naxis = normalised(axis);
+
+  return {{pow(naxis.x(), 2) * (1 - cos(gamma)) + cos(gamma),
+           naxis.x() * naxis.y() * (1 - cos(gamma)) - naxis.z() * sin(gamma),
+           naxis.x() * naxis.z() * (1 - cos(gamma)) + naxis.y() * sin(gamma),
+           0.0},
+
+          {naxis.x() * naxis.y() * (1 - cos(gamma)) + naxis.z() * sin(gamma),
+           pow(naxis.y(), 2) * (1 - cos(gamma)) + cos(gamma),
+           naxis.y() * naxis.z() * (1 - cos(gamma)) - naxis.x() * sin(gamma),
+           0.0},
+
+          {naxis.x() * naxis.z() * (1 - cos(gamma)) - naxis.y() * sin(gamma),
+           naxis.y() * naxis.z() * (1 - cos(gamma)) + naxis.x() * sin(gamma),
+           pow(naxis.z(), 2) * (1 - cos(gamma)) + cos(gamma),
+           0.0},
+
+          {0.0, 0.0, 0.0, 1.0}
+  };
+
+}
+
+
+//--------------------------------------------------------------------------//
+// Plane object
+//--------------------------------------------------------------------------//
+
 /**
  * Matrix trace.
  * @tparam T the underlying data type for the calculation - usually 'double' or
@@ -1395,12 +1446,12 @@ class InfinitePlane {
    */
   InfinitePlane(Vector3D<T> r0, const Vector3D<T> &n) :
       _r0{r0},
-      _n{n.normalized()} {}
+      _n{n.normalised()} {}
 
   /**
    * Create an infinite plane using canonical form:
    *      $A (x - x0) + B (y - y0) + C (z - z0) = 0$.
-   * Note: the quantities A, B & C are subsequently normalized to a unit
+   * Note: the quantities A, B & C are subsequently normalised to a unit
    *       vector.
    *
    */
@@ -1452,14 +1503,14 @@ class InfinitePlane {
 
 };
 
-template <typename T>
+template<typename T>
 class Sphere {
 
  public:
 
-  Sphere(Vector3D<T> p0, T r): _p0{p0}, _r{r} {}
+  Sphere(Vector3D<T> p0, T r) : _p0{p0}, _r{r} {}
 
-  Sphere(T x0, T y0, T z0, T r): _p0{x0, y0, z0}, _r{r} {}
+  Sphere(T x0, T y0, T z0, T r) : _p0{x0, y0, z0}, _r{r} {}
 
  private:
 
@@ -1468,12 +1519,10 @@ class Sphere {
 
 };
 
-template <typename T>
+template<typename T>
 void
 sphere_plane_intersection(const Sphere<T> &sphere,
                           const InfinitePlane<T> &plane) {
-
-
 
 }
 

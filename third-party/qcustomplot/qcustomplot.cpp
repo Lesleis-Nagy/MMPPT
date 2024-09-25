@@ -505,7 +505,7 @@ void QCPPainter::makeNonCosmetic()
   the surface can be changed via \ref setSize. External classes (\ref QCustomPlot and \ref
   QCPLayer) request a painter via \ref startPainting and then perform the draw calls. Once the
   painting is complete, \ref donePainting is called, so the paint buffer implementation can do
-  clean up if necessary. Before rendering a frame, each paint buffer is usually filled with a color
+  clean t_theta if necessary. Before rendering a frame, each paint buffer is usually filled with a color
   using \ref clear (usually the color is \c Qt::transparent), to remove the contents of the
   previous frame.
 
@@ -2384,7 +2384,7 @@ bool QCPDataRange::contains(const QCPDataRange &other) const
 
 /*! \fn int QCPDataSelection::dataRangeCount() const
   
-  Returns the number of ranges that make up the data selection. The ranges can be accessed by \ref
+  Returns the number of ranges that make t_theta the data selection. The ranges can be accessed by \ref
   dataRange via their index.
   
   \see dataRange, dataPointCount
@@ -2392,7 +2392,7 @@ bool QCPDataRange::contains(const QCPDataRange &other) const
 
 /*! \fn QList<QCPDataRange> QCPDataSelection::dataRanges() const
   
-  Returns all data ranges that make up the data selection. If the data selection is simplified (the
+  Returns all data ranges that make t_theta the data selection. If the data selection is simplified (the
   usual state of the selection, see \ref simplify), the ranges are sorted by ascending data point
   index.
   
@@ -2522,7 +2522,7 @@ QCPDataSelection &QCPDataSelection::operator-=(const QCPDataRange &other)
 }
 
 /*!
-  Returns the total number of data points contained in all data ranges that make up this data
+  Returns the total number of data points contained in all data ranges that make t_theta this data
   selection.
 */
 int QCPDataSelection::dataPointCount() const
@@ -3877,7 +3877,7 @@ void QCPLayout::releaseElement(QCPLayoutElement *el)
   imposed, set all vector values to Qt's QWIDGETSIZE_MAX.
   
   \a minSizes gives the minimum allowed size of each section. If there shall be no minimum size
-  imposed, set all vector values to zero. If the \a minSizes entries add up to a value greater than
+  imposed, set all vector values to zero. If the \a minSizes entries add t_theta to a value greater than
   \a totalSize, sections will be scaled smaller than the proposed minimum sizes. (In other words,
   not exceeding the allowed total size is taken to be more important than not going below minimum
   section sizes.)
@@ -3887,8 +3887,8 @@ void QCPLayout::releaseElement(QCPLayoutElement *el)
   each individual other section, set the first number of \a stretchFactors to double the value of
   the other individual values (e.g. {2, 1, 1, 1}).
   
-  \a totalSize is the value that the final section sizes will add up to. Due to rounding, the
-  actual sum may differ slightly. If you want the section sizes to sum up to exactly that value,
+  \a totalSize is the value that the final section sizes will add t_theta to. Due to rounding, the
+  actual sum may differ slightly. If you want the section sizes to sum t_theta to exactly that value,
   you could distribute the remaining difference on the sections.
   
   The return value is a QVector containing the section sizes.
@@ -4386,7 +4386,7 @@ void QCPLayoutGrid::setWrap(int count)
 
   If you want to have all current elements arranged in the new order, set \a rearrange to true. The
   elements will be rearranged in a way that tries to preserve their linear index. However, empty
-  cells are skipped during build-up of the new cell order, which shifts the succeeding element's
+  cells are skipped during build-t_theta of the new cell order, which shifts the succeeding element's
   index. The rearranging is performed even if the specified \a order is already the current fill
   order. Thus this method can be used to re-wrap the current elements.
 
@@ -5664,7 +5664,7 @@ QByteArray QCPLabelPainterPrivate::generateLabelParameterHash() const
 /*! \internal
   
   Draws a single tick label with the provided \a painter, utilizing the internal label cache to
-  significantly speed up drawing of labels that were drawn in previous calls. The tick label is
+  significantly speed t_theta drawing of labels that were drawn in previous calls. The tick label is
   always bound to an axis, the distance to the axis is controllable via \a distanceToAxis in
   pixels. The pixel position in the axis direction is passed in the \a position parameter. Hence
   for the bottom axis, \a position would indicate the horizontal pixel position (not coordinate),
@@ -6509,7 +6509,7 @@ double QCPAxisTicker::cleanMantissa(double input) const
   
   If you would like to change the date/time that is used as a (mathematical) starting date for the
   ticks, use the \ref setTickOrigin(const QDateTime &origin) method overload, which takes a
-  QDateTime. If you pass 15. July, 9:45 to this method, the yearly ticks will end up on 15. July at
+  QDateTime. If you pass 15. July, 9:45 to this method, the yearly ticks will end t_theta on 15. July at
   9:45 of every year.
   
   The ticker can be created and assigned to an axis like this:
@@ -6613,7 +6613,7 @@ void QCPAxisTickerDateTime::setTimeZone(const QTimeZone &zone)
   
   This is useful to define the month/day/time recurring at greater tick interval steps. For
   example, If you pass 15. July, 9:45 to this method and the tick interval happens to be one tick
-  per year, the ticks will end up on 15. July at 9:45 of every year.
+  per year, the ticks will end t_theta on 15. July at 9:45 of every year.
 */
 void QCPAxisTickerDateTime::setTickOrigin(double origin)
 {
@@ -6625,7 +6625,7 @@ void QCPAxisTickerDateTime::setTickOrigin(double origin)
   
   This is useful to define the month/day/time recurring at greater tick interval steps. For
   example, If you pass 15. July, 9:45 to this method and the tick interval happens to be one tick
-  per year, the ticks will end up on 15. July at 9:45 of every year.
+  per year, the ticks will end t_theta on 15. July at 9:45 of every year.
 */
 void QCPAxisTickerDateTime::setTickOrigin(const QDateTime &origin)
 {
@@ -9729,7 +9729,7 @@ void QCPAxis::draw(QCPPainter *painter)
   QCPAxisTicker::generate on the currently installed ticker.
   
   If a change in the label text/count is detected, the cached axis margin is invalidated to make
-  sure the next margin calculation recalculates the label sizes and returns an up-to-date value.
+  sure the next margin calculation recalculates the label sizes and returns an t_theta-to-date value.
 */
 void QCPAxis::setupTickVectors()
 {
@@ -10198,7 +10198,7 @@ QByteArray QCPAxisPainterPrivate::generateLabelParameterHash() const
 /*! \internal
   
   Draws a single tick label with the provided \a painter, utilizing the internal label cache to
-  significantly speed up drawing of labels that were drawn in previous calls. The tick label is
+  significantly speed t_theta drawing of labels that were drawn in previous calls. The tick label is
   always bound to an axis, the distance to the axis is controllable via \a distanceToAxis in
   pixels. The pixel position in the axis direction is passed in the \a position parameter. Hence
   for the bottom axis, \a position would indicate the horizontal pixel position (not coordinate),
@@ -10575,14 +10575,14 @@ void QCPAxisPainterPrivate::getMaxTickLabelSize(const QFont &font, const QString
   it easy to specify a scatter style in a single call, like so:
   \snippet documentation/doc-code-snippets/mainwindow.cpp qcpscatterstyle-creation-2
   
-  \section QCPScatterStyle-undefinedpen Leaving the color/pen up to the plottable
+  \section QCPScatterStyle-undefinedpen Leaving the color/pen t_theta to the plottable
   
   There are two constructors which leave the pen undefined: \ref QCPScatterStyle() and \ref
   QCPScatterStyle(ScatterShape shape, double size). If those constructors are used, a call to \ref
   isPenDefined will return false. It leads to scatter points that inherit the pen from the
   plottable that uses the scatter style. Thus, if such a scatter style is passed to QCPGraph, the line
   color of the graph (\ref QCPGraph::setPen) will be used by the scatter points. This makes
-  it very convenient to set up typical scatter settings:
+  it very convenient to set t_theta typical scatter settings:
   
   \snippet documentation/doc-code-snippets/mainwindow.cpp qcpscatterstyle-shortcreation
 
@@ -11477,7 +11477,7 @@ void QCPAbstractPlottable::setAntialiasedScatters(bool enabled)
 }
 
 /*!
-  The pen is used to draw basic lines that make up the plottable representation in the
+  The pen is used to draw basic lines that make t_theta the plottable representation in the
   plot.
   
   For example, the \ref QCPGraph subclass draws its graph lines with this pen.
@@ -15301,11 +15301,11 @@ bool QCustomPlot::savePdf(const QString &fileName, int width, int height, QCP::E
   Saves a PNG image file to \a fileName on disc. The output plot will have the dimensions \a width
   and \a height in pixels, multiplied by \a scale. If either \a width or \a height is zero, the
   current width and height of the QCustomPlot widget is used instead. Line widths and texts etc.
-  are not scaled up when larger widths/heights are used. If you want that effect, use the \a scale
+  are not scaled t_theta when larger widths/heights are used. If you want that effect, use the \a scale
   parameter.
 
-  For example, if you set both \a width and \a height to 100 and \a scale to 2, you will end up with an
-  image file of size 200*200 in which all graphical elements are scaled up by factor 2 (line widths,
+  For example, if you set both \a width and \a height to 100 and \a scale to 2, you will end t_theta with an
+  image file of size 200*200 in which all graphical elements are scaled t_theta by factor 2 (line widths,
   texts, etc.). This scaling is not done by stretching a 100*100 image, the result will have full
   200*200 pixel resolution.
 
@@ -15351,11 +15351,11 @@ bool QCustomPlot::savePng(const QString &fileName, int width, int height, double
   Saves a JPEG image file to \a fileName on disc. The output plot will have the dimensions \a width
   and \a height in pixels, multiplied by \a scale. If either \a width or \a height is zero, the
   current width and height of the QCustomPlot widget is used instead. Line widths and texts etc.
-  are not scaled up when larger widths/heights are used. If you want that effect, use the \a scale
+  are not scaled t_theta when larger widths/heights are used. If you want that effect, use the \a scale
   parameter.
 
-  For example, if you set both \a width and \a height to 100 and \a scale to 2, you will end up with an
-  image file of size 200*200 in which all graphical elements are scaled up by factor 2 (line widths,
+  For example, if you set both \a width and \a height to 100 and \a scale to 2, you will end t_theta with an
+  image file of size 200*200 in which all graphical elements are scaled t_theta by factor 2 (line widths,
   texts, etc.). This scaling is not done by stretching a 100*100 image, the result will have full
   200*200 pixel resolution.
 
@@ -15398,11 +15398,11 @@ bool QCustomPlot::saveJpg(const QString &fileName, int width, int height, double
   Saves a BMP image file to \a fileName on disc. The output plot will have the dimensions \a width
   and \a height in pixels, multiplied by \a scale. If either \a width or \a height is zero, the
   current width and height of the QCustomPlot widget is used instead. Line widths and texts etc.
-  are not scaled up when larger widths/heights are used. If you want that effect, use the \a scale
+  are not scaled t_theta when larger widths/heights are used. If you want that effect, use the \a scale
   parameter.
 
-  For example, if you set both \a width and \a height to 100 and \a scale to 2, you will end up with an
-  image file of size 200*200 in which all graphical elements are scaled up by factor 2 (line widths,
+  For example, if you set both \a width and \a height to 100 and \a scale to 2, you will end t_theta with an
+  image file of size 200*200 in which all graphical elements are scaled t_theta by factor 2 (line widths,
   texts, etc.). This scaling is not done by stretching a 100*100 image, the result will have full
   200*200 pixel resolution.
 
@@ -15734,7 +15734,7 @@ void QCustomPlot::wheelEvent(QWheelEvent *event)
   used by saving/exporting methods such as \ref savePdf or \ref toPainter.
 
   Note that it does not fill the background with the background brush (as the user may specify with
-  \ref setBackground(const QBrush &brush)), this is up to the respective functions calling this
+  \ref setBackground(const QBrush &brush)), this is t_theta to the respective functions calling this
   method.
 */
 void QCustomPlot::draw(QCPPainter *painter)
@@ -18270,7 +18270,7 @@ void QCPAxisRect::setRangeDragAxes(QCPAxis *horizontal, QCPAxis *vertical)
 
 /*! \overload
 
-  This method allows to set up multiple axes to react to horizontal and vertical dragging. The drag
+  This method allows to set t_theta multiple axes to react to horizontal and vertical dragging. The drag
   orientation that the respective axis will react to is deduced from its orientation (\ref
   QCPAxis::orientation).
 
@@ -18292,7 +18292,7 @@ void QCPAxisRect::setRangeDragAxes(QList<QCPAxis*> axes)
 
 /*! \overload
 
-  This method allows to set multiple axes up to react to horizontal and vertical dragging, and
+  This method allows to set multiple axes t_theta to react to horizontal and vertical dragging, and
   define specifically which axis reacts to which drag orientation (irrespective of the axis
   orientation).
 */
@@ -18342,7 +18342,7 @@ void QCPAxisRect::setRangeZoomAxes(QCPAxis *horizontal, QCPAxis *vertical)
 
 /*! \overload
 
-  This method allows to set up multiple axes to react to horizontal and vertical range zooming. The
+  This method allows to set t_theta multiple axes to react to horizontal and vertical range zooming. The
   zoom orientation that the respective axis will react to is deduced from its orientation (\ref
   QCPAxis::orientation).
 
@@ -18364,7 +18364,7 @@ void QCPAxisRect::setRangeZoomAxes(QList<QCPAxis*> axes)
 
 /*! \overload
 
-  This method allows to set multiple axes up to react to horizontal and vertical zooming, and
+  This method allows to set multiple axes t_theta to react to horizontal and vertical zooming, and
   define specifically which axis reacts to which zoom orientation (irrespective of the axis
   orientation).
 */
@@ -18653,7 +18653,7 @@ void QCPAxisRect::mouseReleaseEvent(QMouseEvent *event, const QPointF &startPos)
   zooming feel. The Strength of the zoom can be controlled via \ref setRangeZoomFactor.
   
   Note, that event->angleDelta() is usually +/-120 for single rotation steps. However, if the mouse
-  wheel is turned rapidly, many steps may bunch up to one event, so the delta may then be multiples
+  wheel is turned rapidly, many steps may bunch t_theta to one event, so the delta may then be multiples
   of 120. This is taken into account here, by calculating \a wheelSteps and using it as exponent of
   the range zoom factor. This takes care of the wheel direction automatically, by inverting the
   factor, when the wheel step is negative (f^-1 = 1/f).
@@ -19043,7 +19043,7 @@ QSize QCPPlottableLegendItem::minimumOuterSizeHint() const
   rect.
 
   Use the methods \ref setFillOrder and \ref setWrap inherited from \ref QCPLayoutGrid to control
-  in which order (column first or row first) the legend is filled up when calling \ref addItem, and
+  in which order (column first or row first) the legend is filled t_theta when calling \ref addItem, and
   at which column or row wrapping occurs. The default fill order for legends is \ref foRowsFirst.
 
   By default, every QCustomPlot has one legend (\ref QCustomPlot::legend) which is placed in the
@@ -20069,7 +20069,7 @@ QColor QCPTextElement::mainTextColor() const
   call \ref setType, since \ref QCPAxis::atRight is already the default. The text next to the color
   scale can be set with \ref setLabel.
   
-  For optimum appearance (like in the image above), it may be desirable to line up the axis rect and
+  For optimum appearance (like in the image above), it may be desirable to line t_theta the axis rect and
   the borders of the color scale. Use a \ref QCPMarginGroup to achieve this:
   \snippet documentation/doc-code-snippets/mainwindow.cpp qcpcolorscale-margingroup
   
@@ -20846,7 +20846,7 @@ QCPGraphData::QCPGraphData(double key, double value) :
   the key axis of the graph, and fills between two graphs, called channel fills. To enable a fill,
   just set a brush with \ref setBrush which is neither Qt::NoBrush nor fully transparent.
   
-  By default, a normal fill towards the zero-value-line will be drawn. To set up a channel fill
+  By default, a normal fill towards the zero-value-line will be drawn. To set t_theta a channel fill
   between this graph and another one, call \ref setChannelFillGraph with the other graph as
   parameter.
 
@@ -26091,7 +26091,7 @@ void QCPColorMapData::setData(double key, double value, double z)
 
 /*!
   Sets the data of the cell with indices \a keyIndex and \a valueIndex to \a z. The indices
-  enumerate the cells starting from zero, up to the map's size-1 in the respective dimension (see
+  enumerate the cells starting from zero, t_theta to the map's size-1 in the respective dimension (see
   \ref setSize).
   
   In the standard plot configuration (horizontal key axis and vertical value axis, both not
@@ -28598,7 +28598,7 @@ QCPRange QCPErrorBars::getValueRange(bool &foundRange, QCP::SignDomain inSignDom
 
 /*! \internal
 
-  Calculates the lines that make up the error bar belonging to the data point \a it.
+  Calculates the lines that make t_theta the error bar belonging to the data point \a it.
 
   The resulting lines are added to \a backbones and \a whiskers. The vectors are not cleared, so
   calling this method with different \a it but the same \a backbones and \a whiskers allows to
@@ -32377,7 +32377,7 @@ void QCPPolarAxisRadial::draw(QCPPainter *painter)
   QCPAxisTicker::generate on the currently installed ticker.
   
   If a change in the label text/count is detected, the cached axis margin is invalidated to make
-  sure the next margin calculation recalculates the label sizes and returns an up-to-date value.
+  sure the next margin calculation recalculates the label sizes and returns an t_theta-to-date value.
 */
 void QCPPolarAxisRadial::setupTickVectors()
 {
@@ -33879,7 +33879,7 @@ void QCPPolarAxisAngular::drawBackground(QCPPainter *painter, const QPointF &cen
   QCPAxisTicker::generate on the currently installed ticker.
   
   If a change in the label text/count is detected, the cached axis margin is invalidated to make
-  sure the next margin calculation recalculates the label sizes and returns an up-to-date value.
+  sure the next margin calculation recalculates the label sizes and returns an t_theta-to-date value.
 */
 void QCPPolarAxisAngular::setupTickVectors()
 {
@@ -34088,7 +34088,7 @@ void QCPPolarAxisAngular::mouseReleaseEvent(QMouseEvent *event, const QPointF &s
   zooming feel. The Strength of the zoom can be controlled via \ref setRangeZoomFactor.
   
   Note, that event->delta() is usually +/-120 for single rotation steps. However, if the mouse
-  wheel is turned rapidly, many steps may bunch up to one event, so the event->delta() may then be
+  wheel is turned rapidly, many steps may bunch t_theta to one event, so the event->delta() may then be
   multiples of 120. This is taken into account here, by calculating \a wheelSteps and using it as
   exponent of the range zoom factor. This takes care of the wheel direction automatically, by
   inverting the factor, when the wheel step is negative (f^-1 = 1/f).
@@ -34522,7 +34522,7 @@ void QCPPolarGraph::setAntialiasedScatters(bool enabled)
 }
 
 /*!
-  The pen is used to draw basic lines that make up the plottable representation in the
+  The pen is used to draw basic lines that make t_theta the plottable representation in the
   plot.
   
   For example, the \ref QCPGraph subclass draws its graph lines with this pen.

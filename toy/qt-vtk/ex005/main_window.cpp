@@ -5,6 +5,9 @@
 
 #include "main_window.hpp"
 
+#define SLIDER_OPACITY_CONST 1000.0
+#define SLIDER_ANGLE_CONST 10.0
+
 MainWindow::MainWindow() {
 
   // Set up the GUI.
@@ -154,8 +157,11 @@ MainWindow::slot_btn_load_tecplot_clicked() {
 
   initialize_gui_plane_parameters_from_model();
 
-  create_plane();
-  create_plane_points();
+  _sample_plane = SamplePlane{_model->length_scale()};
+  show_plane();
+
+  //create_plane();
+  //create_plane_points();
 
   _status_bar->showMessage(tr("Current file: ") + file_info.absoluteFilePath());
 
@@ -255,7 +261,7 @@ MainWindow::slot_chk_vectors_changed(Qt::CheckState state) {
 void
 MainWindow::slot_sli_ugrid_opacity_changed(int value) {
 
-  set_ugrid_opacity((double) value / 1000.0);
+  set_ugrid_opacity((double) value / SLIDER_OPACITY_CONST);
 
   _vtk_widget->update();
   _vtk_widget->renderWindow()->Render();
@@ -265,7 +271,7 @@ MainWindow::slot_sli_ugrid_opacity_changed(int value) {
 void
 MainWindow::slot_sli_vector_opacity_changed(int value) {
 
-  set_arrow_opacity((double) value / 1000.0);
+  set_arrow_opacity((double) value / SLIDER_OPACITY_CONST);
 
   _vtk_widget->update();
   _vtk_widget->renderWindow()->Render();
@@ -275,16 +281,26 @@ MainWindow::slot_sli_vector_opacity_changed(int value) {
 void
 MainWindow::slot_sli_plane_polar_angle_changed(int value) {
 
-  _txt_plane_polar_angle->setText(QString::number((double) value / 10.0));
+  if (!_sample_plane.has_value()) return;
+
+  _txt_plane_polar_angle->setText(
+      QString::number((double) value / SLIDER_ANGLE_CONST)
+  );
+
+  _sample_plane->theta((double)value / SLIDER_ANGLE_CONST);
+
+  _vtk_widget->update();
+  _vtk_widget->renderWindow()->Render();
 
 }
 
 void
 MainWindow::slot_txt_plane_polar_angle_changed(QString value) {
 
-  if (is_plane_hidden()) return;
-
-  draw_plane();
+  if (is_float(value)) {
+    _sli_plane_polar_angle->setValue(int(
+        value.toDouble() * SLIDER_ANGLE_CONST));
+  }
 
   _vtk_widget->update();
   _vtk_widget->renderWindow()->Render();
@@ -294,16 +310,27 @@ MainWindow::slot_txt_plane_polar_angle_changed(QString value) {
 void
 MainWindow::slot_sli_plane_azimuthal_angle_changed(int value) {
 
-  _txt_plane_azimuthal_angle->setText(QString::number((double) value / 10.0));
+  if (!_sample_plane.has_value()) return;
+
+  _txt_plane_azimuthal_angle->setText(QString::number(
+      (double) value / SLIDER_ANGLE_CONST)
+  );
+
+  _sample_plane->phi((double)value / SLIDER_ANGLE_CONST);
+
+  _vtk_widget->update();
+  _vtk_widget->renderWindow()->Render();
 
 }
 
 void
 MainWindow::slot_txt_plane_azimuthal_angle_changed(QString value) {
 
-  if (is_plane_hidden()) return;
-
-  draw_plane();
+  if (is_float(value)) {
+    _sli_plane_azimuthal_angle->setValue(
+        int(value.toDouble() * SLIDER_ANGLE_CONST)
+    );
+  }
 
   _vtk_widget->update();
   _vtk_widget->renderWindow()->Render();
@@ -313,16 +340,28 @@ MainWindow::slot_txt_plane_azimuthal_angle_changed(QString value) {
 void
 MainWindow::slot_sli_plane_orientation_angle_changed(int value) {
 
-  _txt_plane_orientation_angle->setText(QString::number((double) value / 10.0));
+  if (!_sample_plane.has_value()) return;
+
+  _txt_plane_orientation_angle->setText(QString::number(
+      (double) value / SLIDER_ANGLE_CONST)
+  );
+
+  _sample_plane->gamma((double)value / SLIDER_ANGLE_CONST);
+
+  _vtk_widget->update();
+  _vtk_widget->renderWindow()->Render();
+
 
 }
 
 void
 MainWindow::slot_txt_plane_orientation_angle_changed(QString value) {
 
-  if (is_plane_hidden()) return;
-
-  draw_plane();
+  if (is_float(value)) {
+    _sli_plane_orientation_angle->setValue(
+        int(value.toDouble() * SLIDER_ANGLE_CONST)
+    );
+  }
 
   _vtk_widget->update();
   _vtk_widget->renderWindow()->Render();
@@ -332,9 +371,10 @@ MainWindow::slot_txt_plane_orientation_angle_changed(QString value) {
 void
 MainWindow::slot_txt_plane_target_x_changed(QString value) {
 
-  if (is_plane_hidden()) return;
+  if (!_sample_plane.has_value()) return;
+  if (!is_float(value)) return;
 
-  draw_plane();
+  show_plane();
 
   _vtk_widget->update();
   _vtk_widget->renderWindow()->Render();
@@ -344,9 +384,10 @@ MainWindow::slot_txt_plane_target_x_changed(QString value) {
 void
 MainWindow::slot_txt_plane_target_y_changed(QString value) {
 
-  if (is_plane_hidden()) return;
+  if (!_sample_plane.has_value()) return;
+  if (!is_float(value)) return;
 
-  draw_plane();
+  show_plane();
 
   _vtk_widget->update();
   _vtk_widget->renderWindow()->Render();
@@ -356,9 +397,10 @@ MainWindow::slot_txt_plane_target_y_changed(QString value) {
 void
 MainWindow::slot_txt_plane_target_z_changed(QString value) {
 
-  if (is_plane_hidden()) return;
+  if (!_sample_plane.has_value()) return;
+  if (!is_float(value)) return;
 
-  draw_plane();
+  show_plane();
 
   _vtk_widget->update();
   _vtk_widget->renderWindow()->Render();
@@ -367,10 +409,10 @@ MainWindow::slot_txt_plane_target_z_changed(QString value) {
 
 void MainWindow::slot_txt_plane_width_changed(QString value) {
 
-  if (is_plane_hidden()) return;
+  if (!_sample_plane.has_value()) return;
   if (!is_float(value)) return;
 
-  draw_plane();
+  show_plane();
 
   _vtk_widget->update();
   _vtk_widget->renderWindow()->Render();
@@ -380,10 +422,10 @@ void MainWindow::slot_txt_plane_width_changed(QString value) {
 void
 MainWindow::slot_txt_plane_distance_changed(QString value) {
 
-  if (is_plane_hidden()) return;
+  if (!_sample_plane.has_value()) return;
   if (!is_float(value)) return;
 
-  draw_plane();
+  _sample_plane->r(value.toDouble());
 
   _vtk_widget->update();
   _vtk_widget->renderWindow()->Render();
@@ -392,12 +434,6 @@ MainWindow::slot_txt_plane_distance_changed(QString value) {
 
 void
 MainWindow::slot_chk_plane_show_reference_points_changed(Qt::CheckState state) {
-
-  if (state == Qt::CheckState::Checked) {
-    draw_plane_points();
-  } else {
-    hide_plane_points();
-  }
 
   _vtk_widget->update();
   _vtk_widget->renderWindow()->Render();
@@ -410,7 +446,7 @@ MainWindow::slot_chk_plane_hide_plane_changed(Qt::CheckState state) {
   if (state == Qt::CheckState::Checked) {
     hide_plane();
   } else {
-    draw_plane();
+    show_plane();
   }
 
   _vtk_widget->update();
@@ -451,7 +487,7 @@ MainWindow::slot_btn_save_image_clicked() {
 
   QString output_file_name = QFileDialog::getSaveFileName(
       this,
-      tr("Open Tecplot file"),
+      tr("Save image file"),
       last_save_dir
   );
   if (output_file_name.isEmpty()) {
@@ -628,112 +664,57 @@ MainWindow::set_camera_to_z_pos() {
 
 }
 
-std::optional<vtkVector3d>
-MainWindow::plane_position_from_model() const {
+double
+MainWindow::plane_polar_angle_from_gui() const {
 
-  if (!_model.has_value()) return std::nullopt;
-
-  auto center = _model->center();
-  auto length_scale = _model->length_scale();
-
-  return vtkVector3d{
-      center[0],
-      center[1],
-      center[2] - length_scale
-  };
+  return (double) _sli_plane_polar_angle->value() / SLIDER_ANGLE_CONST;
 
 }
 
-std::optional<vtkVector3d>
-MainWindow::plane_target_from_model() const {
+double
+MainWindow::plane_azimuthal_angle_from_gui() const {
 
-  if (!_model.has_value()) return std::nullopt;
+  return (double) _sli_plane_azimuthal_angle->value() / SLIDER_ANGLE_CONST;
 
-  auto center = _model->center();
+}
 
-  return vtkVector3d{
-      center[0],
-      center[1],
-      center[2]
-  };
+double
+MainWindow::plane_orientation_angle_from_gui() const {
+
+  return (double) _sli_plane_orientation_angle->value() / SLIDER_ANGLE_CONST;
 
 }
 
 std::optional<double>
-MainWindow::plane_orientation_from_model() const {
+MainWindow::plane_target_x_from_gui() const {
 
-  if (!_model.has_value()) return std::nullopt;
-
-  return 0.0;
-
-}
-
-std::optional<double>
-MainWindow::plane_width_from_model() const {
-
-  if (!_model.has_value()) return std::nullopt;
-
-  return _model->length_scale();
-
-}
-
-std::optional<vtkVector3d>
-MainWindow::plane_position_from_gui() const {
-
-  auto distance = plane_distance_from_gui();
-  if (!distance.has_value()) {
-    return std::nullopt;
-  }
-
-  double d = distance.value();
-  double azimuth = plane_azimuth_from_gui();
-  double polar = plane_polar_from_gui();
-
-  double x = d * sin(polar * M_PI / 180.0) * cos(azimuth * M_PI / 180.0);
-  double y = d * sin(polar * M_PI / 180.0) * sin(azimuth * M_PI / 180.0);
-  double z = d * cos(polar * M_PI / 180.0);
-
-  return vtkVector3d{x, y, z};
-
-}
-
-std::optional<vtkVector3d>
-MainWindow::plane_target_from_gui() const {
-
-  if (is_float(_txt_plane_target_x->text())
-      && is_float(_txt_plane_target_y->text())
-      && is_float(_txt_plane_target_z->text())) {
-
-    return vtkVector3d{
-        _txt_plane_target_x->text().toDouble(),
-        _txt_plane_target_y->text().toDouble(),
-        _txt_plane_target_z->text().toDouble()
-    };
-
+  if (is_float(_txt_plane_target_x->text())) {
+    return _txt_plane_target_x->text().toDouble();
   }
 
   return std::nullopt;
 
 }
 
-double
-MainWindow::plane_azimuth_from_gui() const {
+std::optional<double>
+MainWindow::plane_target_y_from_gui() const {
 
-  return _txt_plane_azimuthal_angle->text().toDouble();
+  if (is_float(_txt_plane_target_y->text())) {
+    return _txt_plane_target_y->text().toDouble();
+  }
 
-}
-
-double
-MainWindow::plane_polar_from_gui() const {
-
-  return _txt_plane_polar_angle->text().toDouble();
+  return std::nullopt;
 
 }
 
-double
-MainWindow::plane_orientation_from_gui() const {
+std::optional<double>
+MainWindow::plane_target_z_from_gui() const {
 
-  return _txt_plane_orientation_angle->text().toDouble();
+  if (is_float(_txt_plane_target_z->text())) {
+    return _txt_plane_target_z->text().toDouble();
+  }
+
+  return std::nullopt;
 
 }
 
@@ -742,6 +723,17 @@ MainWindow::plane_width_from_gui() const {
 
   if (is_float(_txt_plane_width->text())) {
     return _txt_plane_width->text().toDouble();
+  }
+
+  return std::nullopt;
+
+}
+
+std::optional<double>
+MainWindow::plane_height_from_gui() const {
+
+  if (is_float(_txt_plane_height->text())) {
+    return _txt_plane_height->text().toDouble();
   }
 
   return std::nullopt;
@@ -776,15 +768,6 @@ MainWindow::initialize_gui_plane_parameters_from_model() {
 }
 
 bool
-MainWindow::have_plane_objects() {
-
-  return _plane_source != nullptr
-      && _plane_poly_data_mapper != nullptr
-      && _plane_actor != nullptr;
-
-}
-
-bool
 MainWindow::is_plane_hidden() {
 
   if (_chk_plane_hide_plane->checkState() == Qt::CheckState::Checked) {
@@ -796,225 +779,23 @@ MainWindow::is_plane_hidden() {
 }
 
 void
-MainWindow::create_plane() {
+MainWindow::show_plane() {
 
-  if (!have_plane_objects()) {
-    _plane_source = vtkPlaneSource::New();
-    _plane_source->SetCenter(0.0, 0.0, 0.0);
-    _plane_source->SetNormal(0.0, 0.0, 1.0);
-    _plane_source->SetResolution(10, 10);
-    _plane_source->Update();
-
-    _plane_poly_data_mapper = vtkPolyDataMapper::New();
-    _plane_poly_data_mapper->SetInputData(_plane_source->GetOutput());
-
-    _plane_actor = vtkActor::New();
-    _plane_actor->SetMapper(_plane_poly_data_mapper);
-    _plane_actor->GetProperty()->SetColor(1, 1, 1);
-    _plane_actor->GetProperty()->LightingOff();
-
-    _renderer->AddActor(_plane_actor);
-    _renderer->RemoveActor(_plane_actor);
+  if (_sample_plane.has_value()) {
+    if (!is_plane_hidden()) {
+      _sample_plane->add_actors_to_renderer(_renderer);
+    }
   }
-
-}
-
-void
-MainWindow::remove_plane() {
-
-  if (have_plane_objects()) {
-    _renderer->RemoveActor(_plane_actor);
-
-    _plane_actor->Delete();
-    _plane_poly_data_mapper->Delete();
-    _plane_source->Delete();
-
-    _plane_actor = nullptr;
-    _plane_poly_data_mapper = nullptr;
-    _plane_source = nullptr;
-  }
-
-}
-
-void
-MainWindow::draw_plane() {
-
-  if (!have_plane_objects()) return;
-
-  auto p_trg = plane_target_from_gui();
-  if (!p_trg.has_value()) return;
-
-  auto p_width = plane_width_from_gui();
-  if (!p_width.has_value()) return;
-
-  auto p_pos = plane_position_from_gui();
-  auto p_orientation = plane_orientation_from_gui();
-
-  vtkVector3d planeI = {1.0, 0.0, 0.0};
-  vtkVector3d planeJ = {0.0, 1.0, 0.0};
-  vtkVector3d planeK = {0.0, 0.0, 1.0};
-
-  vtkVector3d d = (p_trg.value() - p_pos.value()).Normalized();
-
-  vtkVector3d rAxis = planeK.Cross(d);
-  double rAngle = acos(planeK.Dot(d));
-
-  std::cout << "rAxis:  " << rAxis.GetX() << ", " << rAxis.GetY() << ", "
-            << rAxis.GetZ() << std::endl;
-  std::cout << "rAngle: " << rAngle << std::endl;
-
-  vtkSmartPointer<vtkTransform> position = vtkTransform::New();
-  position->Translate(p_pos->GetX(), p_pos->GetY(), p_pos->GetZ());
-
-  vtkSmartPointer<vtkTransform> rMatrix = vtkTransform::New();
-  rMatrix->RotateWXYZ(rAngle * 180 / M_PI,
-                      rAxis.GetX(),
-                      rAxis.GetY(),
-                      rAxis.GetZ());
-
-  vtkSmartPointer<vtkTransform> rOriMatrix = vtkTransform::New();
-  rOriMatrix->RotateWXYZ(p_orientation, d.GetX(), d.GetY(), d.GetZ());
-
-  // Create a vtkTransform to apply the transformations
-  vtkSmartPointer<vtkTransform> transform = position;
-  transform->Concatenate(rOriMatrix);
-  transform->Concatenate(rMatrix);
-
-  _plane_actor->SetScale(p_width.value());
-  _plane_actor->SetUserTransform(transform);
-
-  _renderer->AddActor(_plane_actor);
-
-  _chk_plane_hide_plane->setCheckState(Qt::CheckState::Unchecked);
 
 }
 
 void
 MainWindow::hide_plane() {
 
-  if (_plane_actor != nullptr) {
-    _renderer->RemoveActor(_plane_actor);
+  if (_sample_plane.has_value()) {
+    if (is_plane_hidden()) {
+      _sample_plane->remove_actors_from_renderer(_renderer);
+    }
   }
 
 }
-
-bool
-MainWindow::have_plane_point_objects() {
-
-  return have_plane_center_point_objects();
-
-}
-
-bool
-MainWindow::are_plane_points_hidden() {
-
-  if (_chk_show_reference_points->checkState() == Qt::CheckState::Checked) {
-    return true;
-  } else {
-    return false;
-  }
-
-}
-
-void
-MainWindow::create_plane_points() {
-
-  create_plane_center_point();
-
-}
-
-void
-MainWindow::remove_plane_points() {
-
-  remove_plane_center_point();
-
-}
-
-void
-MainWindow::draw_plane_points() {
-
-  draw_plane_center_point();
-
-}
-
-void
-MainWindow::hide_plane_points() {
-
-  hide_plane_center_point();
-
-}
-
-bool
-MainWindow::have_plane_center_point_objects() {
-
-  return _sample_point1_source != nullptr
-      && _sample_point1_data_mapper != nullptr
-      && _sample_point1_actor != nullptr;
-
-}
-
-void
-MainWindow::create_plane_center_point() {
-
-  if (!have_plane_center_point_objects()) {
-    _sample_point1_source = vtkSphereSource::New();
-    _sample_point1_source->SetCenter(0.0, 0.0, 0.0);
-    _sample_point1_source->SetRadius(0.005);
-    _sample_point1_source->SetThetaResolution(30);
-    _sample_point1_source->SetPhiResolution(30);
-    _sample_point1_source->Update();
-
-    _sample_point1_data_mapper = vtkPolyDataMapper::New();
-    _sample_point1_data_mapper->SetInputData(_sample_point1_source->GetOutput());
-
-    _sample_point1_actor = vtkActor::New();
-    _sample_point1_actor->SetMapper(_sample_point1_data_mapper);
-    _sample_point1_actor->GetProperty()->SetColor(1, 0, 0);
-    _sample_point1_actor->GetProperty()->LightingOff();
-
-    _renderer->AddActor(_sample_point1_actor);
-    _renderer->RemoveActor(_sample_point1_actor);
-  }
-
-}
-
-void
-MainWindow::remove_plane_center_point() {
-
-  if (have_plane_objects()) {
-    _renderer->RemoveActor(_sample_point1_actor);
-
-    _sample_point1_actor->Delete();
-    _sample_point1_data_mapper->Delete();
-    _sample_point1_source->Delete();
-
-    _sample_point1_actor = nullptr;
-    _sample_point1_data_mapper = nullptr;
-    _sample_point1_source = nullptr;
-  }
-
-}
-
-void
-MainWindow::draw_plane_center_point() {
-
-  if (!have_plane_objects()) return;
-  if (!have_plane_point_objects()) return;
-
-  auto p_pos = plane_position_from_gui();
-
-  //_plane_center_sphere_actor->
-
-  //_renderer->AddActor(_plane_center_sphere_actor);
-
-}
-
-void
-MainWindow::hide_plane_center_point() {
-
-  if (_sample_point1_actor != nullptr) {
-    _renderer->RemoveActor(_sample_point1_actor);
-  }
-
-}
-

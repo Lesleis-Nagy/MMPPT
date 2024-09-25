@@ -190,13 +190,13 @@ class Model {
   double _arrow_scale{.005};
 
   /**
-   * Function to set up the unstructured grid associated with this mesh.
+   * Function to set t_theta the unstructured grid associated with this mesh.
    */
   void
   setup_ugrid();
 
   /**
-   * Function to set up magnetization vector data.
+   * Function to set t_theta magnetization vector data.
    */
   void
   setup_ugrid_fields();
