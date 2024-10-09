@@ -145,6 +145,10 @@ class SamplePlane {
 
   lcgl::Matrix3x3<double> _rot_matrix;
 
+  vtkSmartPointer<vtkTriangleStrip> _sample_plane_source;
+  vtkSmartPointer<vtkPolyDataMapper> _sample_plane_data_mapper;
+  vtkSmartPointer<vtkActor> _sample_plane_actor;
+
   vtkSmartPointer<vtkSphereSource> _sample_point1_source;
   vtkSmartPointer<vtkPolyDataMapper> _sample_point1_data_mapper;
   vtkSmartPointer<vtkActor> _sample_point1_actor;
@@ -164,8 +168,20 @@ class SamplePlane {
   void
   create_vtk_objects();
 
+  void
+  create_sample_plane_source();
 
+  void
+  update_sample_plane_source();
 
+  void
+  create_sample_plane_data_mapper();
+
+  void
+  create_sample_plane_actor();
+
+  void
+  update_sample_plane_actor();
 
   void
   create_sample_point1_source();

@@ -196,6 +196,7 @@ SamplePlane::add_actors_to_renderer(
     vtkSmartPointer<vtkRenderer> &renderer
 ) const {
 
+  renderer->AddActor(_sample_plane_actor);
   renderer->AddActor(_sample_point1_actor);
   renderer->AddActor(_sample_point2_actor);
   renderer->AddActor(_sample_point3_actor);
@@ -208,6 +209,7 @@ SamplePlane::remove_actors_from_renderer(
     vtkSmartPointer<vtkRenderer> &renderer
 ) const {
 
+  renderer->RemoveActor(_sample_plane_actor);
   renderer->RemoveActor(_sample_point1_actor);
   renderer->RemoveActor(_sample_point2_actor);
   renderer->RemoveActor(_sample_point3_actor);
@@ -269,6 +271,7 @@ SamplePlane::update_sample_points() {
   update_p3();
   update_p4();
 
+  update_sample_plane_source();
   update_sample_point1_actor();
   update_sample_point2_actor();
   update_sample_point3_actor();
@@ -358,6 +361,10 @@ SamplePlane::r(double value) {
 void
 SamplePlane::create_vtk_objects() {
 
+  create_sample_plane_source();
+  create_sample_plane_data_mapper();
+  create_sample_plane_actor();
+
   create_sample_point1_source();
   create_sample_point1_data_mapper();
   create_sample_point1_actor();
@@ -375,6 +382,56 @@ SamplePlane::create_vtk_objects() {
   create_sample_point4_actor();
 
 }
+
+
+void
+SamplePlane::create_sample_plane_source() {
+
+  _sample_plane_source = vtkPlaneSource::New();
+  update_sample_plane_source();
+
+}
+
+void
+SamplePlane::update_sample_plane_source() {
+
+  if (_sample_plane_source == nullptr) return;
+
+  _sample_plane_source->SetCenter(_p1.x(), _p1.y(), _p1.z());
+  _sample_plane_source->SetPoint1(_p3.x(), _p3.y(), _p3.z());
+  _sample_plane_source->SetPoint2(_p4.x(), _p4.y(), _p4.z());
+  _sample_plane_source->SetNormal(_n.x(), _n.y(), _n.z());
+  _sample_plane_source->SetResolution(30, 30);
+  _sample_plane_source->Update();
+
+}
+
+void
+SamplePlane::create_sample_plane_data_mapper() {
+
+  _sample_plane_data_mapper = vtkPolyDataMapper::New();
+  _sample_plane_data_mapper->SetInputData(_sample_plane_source->GetOutput());
+
+}
+
+void
+SamplePlane::create_sample_plane_actor() {
+
+  _sample_plane_actor = vtkActor::New();
+  _sample_plane_actor->SetMapper(_sample_plane_data_mapper);
+  _sample_plane_actor->GetProperty()->SetColor(1, 0, 0);
+  _sample_plane_actor->GetProperty()->LightingOff();
+
+}
+
+void
+SamplePlane::update_sample_plane_actor() {
+
+  // TODO: calculate position/orientation from existing data.
+
+}
+
+
 
 void
 SamplePlane::create_sample_point1_source() {
