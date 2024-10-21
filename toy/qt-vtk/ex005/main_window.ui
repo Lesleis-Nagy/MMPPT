@@ -52,14 +52,14 @@
         <widget class="QLineEdit" name="lineEdit_2">
          <property name="minimumSize">
           <size>
-           <width>20</width>
-           <height>0</height>
+           <width>10</width>
+           <height>10</height>
           </size>
          </property>
          <property name="maximumSize">
           <size>
-           <width>20</width>
-           <height>16777215</height>
+           <width>10</width>
+           <height>10</height>
           </size>
          </property>
          <property name="palette">
@@ -117,14 +117,14 @@
         <widget class="QLineEdit" name="lineEdit_3">
          <property name="minimumSize">
           <size>
-           <width>20</width>
-           <height>0</height>
+           <width>10</width>
+           <height>10</height>
           </size>
          </property>
          <property name="maximumSize">
           <size>
-           <width>20</width>
-           <height>16777215</height>
+           <width>10</width>
+           <height>10</height>
           </size>
          </property>
          <property name="palette">
@@ -166,14 +166,14 @@
         <widget class="QLineEdit" name="lineEdit_5">
          <property name="minimumSize">
           <size>
-           <width>20</width>
-           <height>0</height>
+           <width>10</width>
+           <height>10</height>
           </size>
          </property>
          <property name="maximumSize">
           <size>
-           <width>20</width>
-           <height>16777215</height>
+           <width>10</width>
+           <height>10</height>
           </size>
          </property>
          <property name="palette">
@@ -215,14 +215,14 @@
         <widget class="QLineEdit" name="lineEdit_6">
          <property name="minimumSize">
           <size>
-           <width>20</width>
-           <height>0</height>
+           <width>10</width>
+           <height>10</height>
           </size>
          </property>
          <property name="maximumSize">
           <size>
-           <width>20</width>
-           <height>16777215</height>
+           <width>10</width>
+           <height>10</height>
           </size>
          </property>
          <property name="frame">
@@ -555,7 +555,67 @@
           <string>Sample plane</string>
          </property>
          <layout class="QGridLayout" name="gridLayout">
-          <item row="3" column="0">
+          <item row="0" column="1">
+           <widget class="QGroupBox" name="_grp_plane_polar_angle">
+            <property name="title">
+             <string>polar angle</string>
+            </property>
+            <layout class="QGridLayout" name="gridLayout_9">
+             <property name="leftMargin">
+              <number>5</number>
+             </property>
+             <property name="topMargin">
+              <number>5</number>
+             </property>
+             <property name="rightMargin">
+              <number>5</number>
+             </property>
+             <property name="bottomMargin">
+              <number>5</number>
+             </property>
+             <item row="0" column="2">
+              <widget class="QLabel" name="_lbl_plane_polar_angle_unit">
+               <property name="text">
+                <string>°</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="0">
+              <widget class="QSlider" name="_sli_plane_polar_angle">
+               <property name="maximum">
+                <number>3600</number>
+               </property>
+               <property name="orientation">
+                <enum>Qt::Orientation::Horizontal</enum>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QLineEdit" name="_txt_plane_polar_angle">
+               <property name="minimumSize">
+                <size>
+                 <width>80</width>
+                 <height>0</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>80</width>
+                 <height>16777215</height>
+                </size>
+               </property>
+               <property name="text">
+                <string>0</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item row="3" column="1">
            <widget class="QFrame" name="frame">
             <property name="frameShape">
              <enum>QFrame::Shape::NoFrame</enum>
@@ -576,45 +636,78 @@
              <property name="bottomMargin">
               <number>0</number>
              </property>
-             <item row="8" column="2">
-              <widget class="QLineEdit" name="_txt_plane_target_y">
-               <property name="minimumSize">
-                <size>
-                 <width>50</width>
-                 <height>0</height>
-                </size>
+             <property name="horizontalSpacing">
+              <number>4</number>
+             </property>
+             <property name="verticalSpacing">
+              <number>8</number>
+             </property>
+             <item row="10" column="4" rowspan="2">
+              <widget class="QFrame" name="frame_3">
+               <property name="frameShape">
+                <enum>QFrame::Shape::NoFrame</enum>
                </property>
-               <property name="maximumSize">
-                <size>
-                 <width>16777215</width>
-                 <height>16777215</height>
-                </size>
+               <property name="frameShadow">
+                <enum>QFrame::Shadow::Raised</enum>
                </property>
+               <layout class="QHBoxLayout" name="horizontalLayout_5">
+                <property name="spacing">
+                 <number>0</number>
+                </property>
+                <property name="leftMargin">
+                 <number>0</number>
+                </property>
+                <property name="topMargin">
+                 <number>0</number>
+                </property>
+                <property name="rightMargin">
+                 <number>0</number>
+                </property>
+                <property name="bottomMargin">
+                 <number>0</number>
+                </property>
+                <item>
+                 <widget class="QLabel" name="_lbl_plane_ny">
+                  <property name="text">
+                   <string>ny:</string>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLineEdit" name="_txt_plane_ny"/>
+                </item>
+               </layout>
               </widget>
              </item>
-             <item row="11" column="1">
+             <item row="14" column="1" rowspan="2">
               <widget class="QLineEdit" name="_txt_plane_distance"/>
              </item>
-             <item row="10" column="1">
+             <item row="12" column="1" rowspan="2">
               <widget class="QLineEdit" name="_txt_plane_height"/>
              </item>
-             <item row="10" column="0">
-              <widget class="QLabel" name="_lbl_plane_height">
+             <item row="10" column="1" rowspan="2">
+              <widget class="QLineEdit" name="_txt_plane_width"/>
+             </item>
+             <item row="7" column="4">
+              <widget class="QLabel" name="_lbl_plane_target_z">
                <property name="text">
-                <string>height:</string>
+                <string>z</string>
                </property>
                <property name="alignment">
-                <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+                <set>Qt::AlignmentFlag::AlignCenter</set>
                </property>
               </widget>
              </item>
-             <item row="9" column="0">
-              <widget class="QLabel" name="_lbl_plane_width">
+             <item row="7" column="2">
+              <widget class="QLabel" name="_lbl_plane_target_y">
                <property name="text">
-                <string>width:</string>
+                <string>y</string>
                </property>
                <property name="alignment">
-                <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+                <set>Qt::AlignmentFlag::AlignCenter</set>
                </property>
               </widget>
              </item>
@@ -634,17 +727,7 @@
                </property>
               </widget>
              </item>
-             <item row="10" column="2" colspan="2">
-              <widget class="QCheckBox" name="_chk_plane_hide_plane">
-               <property name="text">
-                <string>hide plane</string>
-               </property>
-               <property name="checked">
-                <bool>true</bool>
-               </property>
-              </widget>
-             </item>
-             <item row="8" column="3">
+             <item row="8" column="4" rowspan="2">
               <widget class="QLineEdit" name="_txt_plane_target_z">
                <property name="minimumSize">
                 <size>
@@ -660,34 +743,7 @@
                </property>
               </widget>
              </item>
-             <item row="7" column="3">
-              <widget class="QLabel" name="_lbl_plane_target_z">
-               <property name="text">
-                <string>z</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignmentFlag::AlignCenter</set>
-               </property>
-              </widget>
-             </item>
-             <item row="9" column="2" colspan="2">
-              <widget class="QCheckBox" name="_chk_show_reference_points">
-               <property name="text">
-                <string>show reference points</string>
-               </property>
-              </widget>
-             </item>
-             <item row="11" column="0">
-              <widget class="QLabel" name="_lbl_plane_distance">
-               <property name="text">
-                <string>distance:</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
-               </property>
-              </widget>
-             </item>
-             <item row="8" column="1">
+             <item row="8" column="1" rowspan="2">
               <widget class="QLineEdit" name="_txt_plane_target_x">
                <property name="minimumSize">
                 <size>
@@ -713,23 +769,116 @@
                </property>
               </widget>
              </item>
-             <item row="7" column="2">
-              <widget class="QLabel" name="_lbl_plane_target_y">
-               <property name="text">
-                <string>y</string>
+             <item row="8" column="2" rowspan="2">
+              <widget class="QLineEdit" name="_txt_plane_target_y">
+               <property name="minimumSize">
+                <size>
+                 <width>50</width>
+                 <height>0</height>
+                </size>
                </property>
-               <property name="alignment">
-                <set>Qt::AlignmentFlag::AlignCenter</set>
+               <property name="maximumSize">
+                <size>
+                 <width>16777215</width>
+                 <height>16777215</height>
+                </size>
                </property>
               </widget>
              </item>
-             <item row="9" column="1">
-              <widget class="QLineEdit" name="_txt_plane_width"/>
+             <item row="10" column="2" rowspan="2">
+              <widget class="QFrame" name="frame_2">
+               <property name="frameShape">
+                <enum>QFrame::Shape::NoFrame</enum>
+               </property>
+               <property name="frameShadow">
+                <enum>QFrame::Shadow::Raised</enum>
+               </property>
+               <property name="lineWidth">
+                <number>1</number>
+               </property>
+               <layout class="QHBoxLayout" name="horizontalLayout_4">
+                <property name="spacing">
+                 <number>0</number>
+                </property>
+                <property name="leftMargin">
+                 <number>0</number>
+                </property>
+                <property name="topMargin">
+                 <number>0</number>
+                </property>
+                <property name="rightMargin">
+                 <number>0</number>
+                </property>
+                <property name="bottomMargin">
+                 <number>0</number>
+                </property>
+                <item>
+                 <widget class="QLabel" name="_lbl_plane_nx">
+                  <property name="text">
+                   <string>nx:</string>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLineEdit" name="_txt_plane_nx"/>
+                </item>
+               </layout>
+              </widget>
+             </item>
+             <item row="12" column="0" rowspan="2">
+              <widget class="QLabel" name="_lbl_plane_height">
+               <property name="text">
+                <string>height:</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item row="10" column="0" rowspan="2">
+              <widget class="QLabel" name="_lbl_plane_width">
+               <property name="text">
+                <string>width:</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item row="14" column="0" rowspan="2">
+              <widget class="QLabel" name="_lbl_plane_distance">
+               <property name="text">
+                <string>distance:</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item row="14" column="2" rowspan="2">
+              <widget class="QCheckBox" name="_chk_show_reference_points">
+               <property name="text">
+                <string>show ref. points</string>
+               </property>
+              </widget>
+             </item>
+             <item row="14" column="4" rowspan="2">
+              <widget class="QCheckBox" name="_chk_plane_hide_plane">
+               <property name="text">
+                <string>hide plane</string>
+               </property>
+               <property name="checked">
+                <bool>true</bool>
+               </property>
+              </widget>
              </item>
             </layout>
            </widget>
           </item>
-          <item row="2" column="0">
+          <item row="2" column="1">
            <widget class="QGroupBox" name="_grp_plane_orientation">
             <property name="minimumSize">
              <size>
@@ -795,7 +944,7 @@
             </layout>
            </widget>
           </item>
-          <item row="1" column="0">
+          <item row="1" column="1">
            <widget class="QGroupBox" name="_grp_plane_azimuthal_angle">
             <property name="title">
              <string>azimuthal angle</string>
@@ -855,66 +1004,6 @@
             </layout>
            </widget>
           </item>
-          <item row="0" column="0">
-           <widget class="QGroupBox" name="_grp_plane_polar_angle">
-            <property name="title">
-             <string>polar angle</string>
-            </property>
-            <layout class="QGridLayout" name="gridLayout_9">
-             <property name="leftMargin">
-              <number>5</number>
-             </property>
-             <property name="topMargin">
-              <number>5</number>
-             </property>
-             <property name="rightMargin">
-              <number>5</number>
-             </property>
-             <property name="bottomMargin">
-              <number>5</number>
-             </property>
-             <item row="0" column="2">
-              <widget class="QLabel" name="_lbl_plane_polar_angle_unit">
-               <property name="text">
-                <string>°</string>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="0">
-              <widget class="QSlider" name="_sli_plane_polar_angle">
-               <property name="maximum">
-                <number>3600</number>
-               </property>
-               <property name="orientation">
-                <enum>Qt::Orientation::Horizontal</enum>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="1">
-              <widget class="QLineEdit" name="_txt_plane_polar_angle">
-               <property name="minimumSize">
-                <size>
-                 <width>80</width>
-                 <height>0</height>
-                </size>
-               </property>
-               <property name="maximumSize">
-                <size>
-                 <width>80</width>
-                 <height>16777215</height>
-                </size>
-               </property>
-               <property name="text">
-                <string>0</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </widget>
-          </item>
          </layout>
         </widget>
        </item>
@@ -929,7 +1018,7 @@
      <x>0</x>
      <y>0</y>
      <width>1728</width>
-     <height>37</height>
+     <height>24</height>
     </rect>
    </property>
    <widget class="QMenu" name="_menu_file">

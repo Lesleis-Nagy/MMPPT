@@ -21,6 +21,7 @@
 #include <vtkSmartPointer.h>
 #include <vtkSphereSource.h>
 #include <vtkTransform.h>
+#include <vtkTriangleStrip.h>
 
 #include "model.hpp"
 
@@ -30,64 +31,95 @@ class SamplePlane {
 
  public:
 
-  SamplePlane(double length_scale);
+  explicit SamplePlane(double length_scale);
 
   //-------------------------------------------------------------------------//
   //- Public getters                                                        -//
   //-------------------------------------------------------------------------//
 
-  [[nodiscard]] double length_scale() const;
+  [[nodiscard]] double
+  length_scale() const;
 
-  [[nodiscard]] double scale_multiplier() const;
+  [[nodiscard]] double
+  scale_multiplier() const;
 
-  [[nodiscard]] int point_resolution_theta() const;
+  [[nodiscard]] int
+  point_resolution_theta() const;
 
-  [[nodiscard]] int point_resolution_phi() const;
+  [[nodiscard]] int
+  point_resolution_phi() const;
 
-  [[nodiscard]] const lcgl::Vector3D<double> & target() const;
+  [[nodiscard]] const lcgl::Vector3D<double> &
+  target() const;
 
-  [[nodiscard]] const lcgl::Vector3D<double> & pc() const;
+  [[nodiscard]] const lcgl::Vector3D<double> &
+  pc() const;
 
-  [[nodiscard]] const lcgl::Vector3D<double> & p1() const;
+  [[nodiscard]] const lcgl::Vector3D<double> &
+  p1() const;
 
-  [[nodiscard]] const lcgl::Vector3D<double> & p2() const;
+  [[nodiscard]] const lcgl::Vector3D<double> &
+  p2() const;
 
-  [[nodiscard]] const lcgl::Vector3D<double> & p3() const;
+  [[nodiscard]] const lcgl::Vector3D<double> &
+  p3() const;
 
-  [[nodiscard]] const lcgl::Vector3D<double> & p4() const;
+  [[nodiscard]] const lcgl::Vector3D<double> &
+  p4() const;
 
-  [[nodiscard]] const lcgl::Vector3D<double> & n() const;
+  [[nodiscard]] const lcgl::Vector3D<double> &
+  n() const;
 
-  [[nodiscard]] const lcgl::Vector3D<double> & t_theta() const;
+  [[nodiscard]] const lcgl::Vector3D<double> &
+  t_theta() const;
 
-  [[nodiscard]] const lcgl::Vector3D<double> & t_phi() const;
+  [[nodiscard]] const lcgl::Vector3D<double> &
+  t_phi() const;
 
-  [[nodiscard]] double width() const;
+  [[nodiscard]] double
+  width() const;
 
-  [[nodiscard]] double height() const;
+  [[nodiscard]] double
+  height() const;
 
-  [[nodiscard]] double theta() const;
+  [[nodiscard]] double
+  theta() const;
 
-  [[nodiscard]] double phi() const;
+  [[nodiscard]] double
+  phi() const;
 
-  [[nodiscard]] double gamma() const;
+  [[nodiscard]] double
+  gamma() const;
 
-  [[nodiscard]] double r() const;
+  [[nodiscard]] double
+  r() const;
 
-  [[nodiscard]] bool have_sample_point1_vtk_objects() const;
+  [[nodiscard]] bool
+  have_sample_point1_vtk_objects() const;
 
-  [[nodiscard]] bool have_sample_point2_vtk_objects() const;
+  [[nodiscard]] bool
+  have_sample_point2_vtk_objects() const;
 
-  [[nodiscard]] bool have_sample_point3_vtk_objects() const;
+  [[nodiscard]] bool
+  have_sample_point3_vtk_objects() const;
 
-  [[nodiscard]] bool have_sample_point4_vtk_objects() const;
+  [[nodiscard]] bool
+  have_sample_point4_vtk_objects() const;
 
+  [[nodiscard]] std::vector<lcgl::Vector3D<double>>
+  sample_points() const;
+
+  [[nodiscard]] size_t
+  nx() const;
+
+  [[nodiscard]] size_t
+  ny() const;
 
   //-------------------------------------------------------------------------//
   //- Public setters                                                        -//
   //-------------------------------------------------------------------------//
 
-  void update_sample_points();
+  void update_graphics();
 
   void scale_multiplier(double value);
 
@@ -109,6 +141,10 @@ class SamplePlane {
 
   void r(double value);
 
+  void nx(size_t value);
+
+  void ny(size_t value);
+
   //-------------------------------------------------------------------------//
   // Public utility functions
   //-------------------------------------------------------------------------//
@@ -126,22 +162,25 @@ class SamplePlane {
   int _point_resolution_theta;
   int _point_resolution_phi;
 
-  lcgl::Vector3D<double> _target;
-  lcgl::Vector3D<double> _n;
-  lcgl::Vector3D<double> _t_theta;
-  lcgl::Vector3D<double> _t_phi;
-  double _theta;  // polar angle
-  double _phi;    // azimuthal angle
+  lcgl::Vector3D<double> _target;  // plane is oriented towards this point
+  lcgl::Vector3D<double> _n;       // normal of the plane
+  lcgl::Vector3D<double> _t_theta; // polar vector (see: ISO 80000-2:2019)
+  lcgl::Vector3D<double> _t_phi;   // azimuthal vector (see: ISO 80000-2:2019)
+
+  double _theta;  // polar angle (see: ISO 80000-2:2019)
+  double _phi;    // azimuthal angle (see: ISO 80000-2:2019)
   double _gamma;  // orientation angle
-  double _r;      // distance from target
+  double _r;      // radial distance from target (see: ISO 80000-2:2019)
   double _width;  // plane width
   double _height; // plane height
+  size_t _nx;     // no. of sample points in plane-horizontal direction.
+  size_t _ny;     // no. of sample points in plane-vertical direction.
 
-  lcgl::Vector3D<double> _pc;
-  lcgl::Vector3D<double> _p1;
-  lcgl::Vector3D<double> _p2;
-  lcgl::Vector3D<double> _p3;
-  lcgl::Vector3D<double> _p4;
+  lcgl::Vector3D<double> _pc; // The plane center
+  lcgl::Vector3D<double> _p1; // The first point on the plane (red)
+  lcgl::Vector3D<double> _p2; // The second point on the plane (green)
+  lcgl::Vector3D<double> _p3; // The third point on the plane (blue)
+  lcgl::Vector3D<double> _p4; // The fourth point on the plane (white)
 
   lcgl::Matrix3x3<double> _rot_matrix;
 
@@ -198,10 +237,6 @@ class SamplePlane {
   void
   update_sample_point1_actor();
 
-
-
-
-
   void
   create_sample_point2_source();
 
@@ -217,10 +252,6 @@ class SamplePlane {
   void
   update_sample_point2_actor();
 
-
-
-
-
   void
   create_sample_point3_source();
 
@@ -235,11 +266,6 @@ class SamplePlane {
 
   void
   update_sample_point3_actor();
-
-
-
-
-
 
   void
   create_sample_point4_source();

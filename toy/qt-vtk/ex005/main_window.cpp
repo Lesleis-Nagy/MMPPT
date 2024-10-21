@@ -158,6 +158,7 @@ MainWindow::slot_btn_load_tecplot_clicked() {
   initialize_gui_plane_parameters_from_model();
 
   _sample_plane = SamplePlane{_model->length_scale()};
+  //_txt_plane_nx =
   show_plane();
 
   //create_plane();

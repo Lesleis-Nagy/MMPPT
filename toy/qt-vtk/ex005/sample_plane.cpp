@@ -22,6 +22,11 @@ SamplePlane::SamplePlane(double length_scale) :
     _theta{0.0},
     _phi{0.0},
     _gamma{0.0},
+    _r{0.0},
+    _width{0.0},
+    _height{0.0},
+    _nx{10},
+    _ny{10},
     _pc{0.0, 0.0, 0.0},
     _p1{0.0, 0.0, 0.0},
     _p2{0.0, 0.0, 0.0},
@@ -46,7 +51,7 @@ SamplePlane::SamplePlane(double length_scale) :
   _height = _length_scale;
 
   create_vtk_objects();
-  update_sample_points();
+  update_graphics();
 
 }
 
@@ -187,6 +192,29 @@ SamplePlane::r() const {
 
 }
 
+std::vector<lcgl::Vector3D<double>>
+SamplePlane::sample_points() const {
+
+  std::vector<lcgl::Vector3D<double>> points;
+
+  return points;
+
+}
+
+size_t
+SamplePlane::nx() const {
+
+  return _nx;
+
+}
+
+size_t
+SamplePlane::ny() const {
+
+  return _ny;
+
+}
+
 //-------------------------------------------------------------------------//
 // Public utility functions
 //-------------------------------------------------------------------------//
@@ -258,7 +286,7 @@ SamplePlane::have_sample_point4_vtk_objects() const {
 //---------------------------------------------------------------------------//
 
 void
-SamplePlane::update_sample_points() {
+SamplePlane::update_graphics() {
 
   update_n();
   update_pc();
@@ -283,7 +311,7 @@ void
 SamplePlane::scale_multiplier(double value) {
 
   _scale_multiplier = value;
-  update_sample_points();
+  update_graphics();
 
 }
 
@@ -291,7 +319,7 @@ void
 SamplePlane::point_resolution_theta(int value) {
 
   _point_resolution_theta = value;
-  update_sample_points();
+  update_graphics();
 
 }
 
@@ -299,7 +327,7 @@ void
 SamplePlane::point_resolution_phi(int value) {
 
   _point_resolution_phi = value;
-  update_sample_points();
+  update_graphics();
 
 }
 
@@ -314,7 +342,7 @@ void
 SamplePlane::width(double value) {
 
   _width = value;
-  update_sample_points();
+  update_graphics();
 
 }
 
@@ -322,7 +350,7 @@ void
 SamplePlane::height(double value) {
 
   _height = value;
-  update_sample_points();
+  update_graphics();
 
 }
 
@@ -330,7 +358,7 @@ void
 SamplePlane::theta(double value) {
 
   _theta = value;
-  update_sample_points();
+  update_graphics();
 
 }
 
@@ -338,7 +366,7 @@ void
 SamplePlane::phi(double value) {
 
   _phi = value;
-  update_sample_points();
+  update_graphics();
 
 }
 
@@ -346,7 +374,7 @@ void
 SamplePlane::gamma(double value) {
 
   _gamma = value;
-  update_sample_points();
+  update_graphics();
 
 }
 
@@ -354,7 +382,21 @@ void
 SamplePlane::r(double value) {
 
   _r = value;
-  update_sample_points();
+  update_graphics();
+
+}
+
+void
+SamplePlane::nx(size_t value) {
+
+  _nx = value;
+
+}
+
+void
+SamplePlane::ny(size_t value) {
+
+  _ny = value;
 
 }
 
@@ -387,8 +429,10 @@ SamplePlane::create_vtk_objects() {
 void
 SamplePlane::create_sample_plane_source() {
 
+  /*
   _sample_plane_source = vtkPlaneSource::New();
   update_sample_plane_source();
+   */
 
 }
 
@@ -396,22 +440,23 @@ void
 SamplePlane::update_sample_plane_source() {
 
   if (_sample_plane_source == nullptr) return;
-
+  /*
   _sample_plane_source->SetCenter(_p1.x(), _p1.y(), _p1.z());
   _sample_plane_source->SetPoint1(_p3.x(), _p3.y(), _p3.z());
   _sample_plane_source->SetPoint2(_p4.x(), _p4.y(), _p4.z());
   _sample_plane_source->SetNormal(_n.x(), _n.y(), _n.z());
   _sample_plane_source->SetResolution(30, 30);
   _sample_plane_source->Update();
+  */
 
 }
 
 void
 SamplePlane::create_sample_plane_data_mapper() {
-
+ /*
   _sample_plane_data_mapper = vtkPolyDataMapper::New();
   _sample_plane_data_mapper->SetInputData(_sample_plane_source->GetOutput());
-
+ */
 }
 
 void
@@ -430,8 +475,6 @@ SamplePlane::update_sample_plane_actor() {
   // TODO: calculate position/orientation from existing data.
 
 }
-
-
 
 void
 SamplePlane::create_sample_point1_source() {
