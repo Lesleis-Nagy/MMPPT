@@ -192,12 +192,38 @@ SamplePlane::r() const {
 
 }
 
-std::vector<lcgl::Vector3D<double>>
-SamplePlane::sample_points() const {
+std::tuple<
+    std::vector<std::vector<double>>,
+    std::vector<std::vector<double>>,
+    std::vector<std::vector<double>>
+>
+SamplePlane::sample_points(size_t nx, size_t ny) const {
 
   std::vector<lcgl::Vector3D<double>> points;
 
-  return points;
+  lcgl::Vector3D<double> e1 = normalised((_p4 - _p2));
+  lcgl::Vector3D<double> e2 = normalised((_p1 - _p2));
+
+  double de1 = _width / (double) (nx - 1);
+  double de2 = _height / (double) (ny - 1);
+
+  std::vector<std::vector<double>> xs(ny);
+  std::vector<std::vector<double>> ys(ny);
+  std::vector<std::vector<double>> zs(ny);
+
+  for (size_t i = 0; i < ny; ++i) {
+    xs[i].resize(ny);
+    ys[i].resize(ny);
+    zs[i].resize(ny);
+    for (size_t j = 0; j < nx; ++j) {
+      auto point = _p2 + (double) i * de1 * e1 + (double) j * de2 * e2;
+      xs[i][j] = point.x();
+      ys[i][j] = point.y();
+      zs[i][j] = point.z();
+    }
+  }
+
+  return {xs, ys, zs};
 
 }
 
@@ -425,7 +451,6 @@ SamplePlane::create_vtk_objects() {
 
 }
 
-
 void
 SamplePlane::create_sample_plane_source() {
 
@@ -453,10 +478,10 @@ SamplePlane::update_sample_plane_source() {
 
 void
 SamplePlane::create_sample_plane_data_mapper() {
- /*
-  _sample_plane_data_mapper = vtkPolyDataMapper::New();
-  _sample_plane_data_mapper->SetInputData(_sample_plane_source->GetOutput());
- */
+  /*
+   _sample_plane_data_mapper = vtkPolyDataMapper::New();
+   _sample_plane_data_mapper->SetInputData(_sample_plane_source->GetOutput());
+  */
 }
 
 void

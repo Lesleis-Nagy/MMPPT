@@ -106,8 +106,12 @@ class SamplePlane {
   [[nodiscard]] bool
   have_sample_point4_vtk_objects() const;
 
-  [[nodiscard]] std::vector<lcgl::Vector3D<double>>
-  sample_points() const;
+  [[nodiscard]] std::tuple<
+      std::vector<std::vector<double>>,
+      std::vector<std::vector<double>>,
+      std::vector<std::vector<double>>
+  >
+  sample_points(size_t nx, size_t ny) const;
 
   [[nodiscard]] size_t
   nx() const;

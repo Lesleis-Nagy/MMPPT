@@ -5,6 +5,8 @@
 #ifndef MMPPT_TOY_QT_VTK_EX005_MAINWINDOW_H_
 #define MMPPT_TOY_QT_VTK_EX005_MAINWINDOW_H_
 
+#include <vector>
+
 #include <QApplication>
 #include <QImage>
 #include <QPainter>
@@ -22,13 +24,18 @@ class PixelWidget : public QWidget {
    * Constructor.
    */
   explicit PixelWidget(QWidget *parent = nullptr);
+  void blank_image();
+  void update_image();
+  void update_image(const std::vector<std::vector<double>> &);
+
+  [[nodiscard]] int nx() const;
+  [[nodiscard]] int ny() const;
 
  public slots:
 
-  void update_image();
-  void set_width(int width);
-  void set_height(int height);
-  void save_file(const QString& destination);
+  void nx(int value);
+  void ny(int value);
+  void save_file(const QString &destination);
 
  protected:
 
@@ -36,10 +43,11 @@ class PixelWidget : public QWidget {
 
  private:
 
+  void generate_blank_image();
   void generate_random_image();
 
-  int _width;
-  int _height;
+  int _nx;
+  int _ny;
 
   QImage _image;
 

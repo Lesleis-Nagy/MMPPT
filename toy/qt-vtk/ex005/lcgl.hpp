@@ -96,6 +96,12 @@ class Vector3D {
    */
   [[nodiscard]] T operator()(size_t idx) const { return _x[idx]; }
 
+  void operator+=(const Vector3D<T> &rhs) {
+    _x[0] += rhs.x();
+    _x[1] += rhs.y();
+    _x[2] += rhs.z();
+  }
+
  private:
 
   std::array<T, 3> _x;
@@ -1419,112 +1425,188 @@ Matrix4x4<T> rotation(T gamma, const Vector4D<T> &axis) {
 
 
 //--------------------------------------------------------------------------//
-// Plane object
+// Geometry
 //--------------------------------------------------------------------------//
 
 /**
- * Matrix trace.
+ * Return the edge_length between two vector endpoints.
  * @tparam T the underlying data type for the calculation - usually 'double' or
  *           'mpreal'.
- * @param m the matrix for which to compute the trace.
- * @return the matrix trace.
+ * @param lhs vector representing the start point of the edge.
+ * @param rhs vector representing the end point of the edge.
+ * @return the length of the edge.
  */
 template<typename T>
-T trace(const Matrix4x4<T> &m) {
+T edge_length(const Vector3D<T> &lhs, const Vector3D<T> &rhs) {
 
-  return m(0, 0) + m(1, 1) + m(2, 2) + m(3, 3);
+  return norm(lhs - rhs);
+
+}
+
+/**
+ * Return the edge center between two vector endpoints.
+ * @tparam T the underlying data type for the calculation - usually 'double' or
+ *          'mpreal'.
+ * @param r1 vector representing the start point of the edge.
+ * @param r2 vector representing the end point of the edge.
+ * @return the vector representing the center point of the edge.
+ */
+template<typename T>
+Vector3D<T> edge_center(const Vector3D<T> &r1, const Vector3D<T> &r2) {
+
+  return (r1 + r2) / 2.0;
 
 }
 
+/**
+ * Return the orientation vector between two vector end points; this is the unit
+ * vector pointing from \f$r_1\f$ to
+ * \f$r_2\f$.
+ * @tparam T the underlying data type for the calculation - usually 'double' or 'mpreal'.
+ * @param r1 vector representing the start point of the edge.
+ * @param r2 vector representing the end point of the edge.
+ * @return the unit vector pointing from \f$r_1\f$ to \f$r_2\f$.
+ */
 template<typename T>
-class InfinitePlane {
+Vector3D<T> edge_orientation(const Vector3D<T> &r1, const Vector3D<T> &r2) {
 
- public:
-
-  /**
-   * Create an infinite plane in point-normal form.
-   */
-  InfinitePlane(Vector3D<T> r0, const Vector3D<T> &n) :
-      _r0{r0},
-      _n{n.normalised()} {}
-
-  /**
-   * Create an infinite plane using canonical form:
-   *      $A (x - x0) + B (y - y0) + C (z - z0) = 0$.
-   * Note: the quantities A, B & C are subsequently normalised to a unit
-   *       vector.
-   *
-   */
-  InfinitePlane(T A, T B, T C, T x0, T y0, T z0) :
-      _r0{x0, y0, z0},
-      _n{A, B, C} {
-    _n = normalised(_n);
-  }
-
-  [[nodiscard]] const Vector3D<T> &
-  r0() const {
-    return _r0;
-  }
-
-  [[nodiscard]] const Vector3D<T> &
-  n() const {
-    return _n;
-  }
-
-  [[nodiscard]] T
-  A() const {
-    return _n.x();
-  }
-
-  [[nodiscard]] T
-  B() const {
-    return _n.y();
-  }
-  [[nodiscard]] T
-  C() const {
-    return _n.z();
-  }
-  [[nodiscard]] T
-  x0() const {
-    return _r0.z();
-  }
-  [[nodiscard]] T
-  x1() const {
-    return _r0.y();
-  }
-  [[nodiscard]] T
-  x2() const {
-    return _r0.z();
-  }
- private:
-
-  Vector3D<T> _r0;
-  Vector3D<T> _n;
-
-};
-
-template<typename T>
-class Sphere {
-
- public:
-
-  Sphere(Vector3D<T> p0, T r) : _p0{p0}, _r{r} {}
-
-  Sphere(T x0, T y0, T z0, T r) : _p0{x0, y0, z0}, _r{r} {}
-
- private:
-
-  Vector3D<T> _p0;
-  T _r;
-
-};
-
-template<typename T>
-void
-sphere_plane_intersection(const Sphere<T> &sphere,
-                          const InfinitePlane<T> &plane) {
+  return normalised(r2 - r1);
 
 }
+
+/**
+ * Return the triangle normal vector assuming vertex clockwise winding
+ * \f$ r_1 \rightarrow r_2 \f$, \f$ r_2 \rightarrow r_3 \f$ and
+ * \f$ r_3 \rightarrow r_1 \f$.
+ * @tparam T the underlying data type for the calculation - usually 'double' or 'mpreal'.
+ * @param r1 vector representing a point on the triangle.
+ * @param r2 vector representing a point on the triangle.
+ * @param r3 vector representing a point on the triangle.
+ * @return the triangle normal vector.
+ */
+template<typename T>
+Vector3D<T> triangle_normal(const Vector3D<T> &r1,
+                            const Vector3D<T> &r2,
+                            const Vector3D<T> &r3) {
+
+  return normalised(cross(r2 - r1, r3 - r1));
+
+}
+
+/**
+ * Return the triangle center vector.
+ * @tparam T the underlying data type for the calculation - usually 'double' or
+ *           'mpreal'.
+ * @param r1 vector representing a point on the triangle.
+ * @param r2 vector representing a point on the triangle.
+ * @param r3 vector representing a point on the triangle.
+ * @return the triangle center vector.
+ */
+template<typename T>
+Vector3D<T> triangle_center(const Vector3D<T> &r1,
+                            const Vector3D<T> &r2,
+                            const Vector3D<T> &r3) {
+
+  Vector3D<T> sum = (r1 + r2) + r3;
+  return sum / 3.0;
+
+}
+
+/**
+ * Retrieves a rotation matrix using the axis/angle formulation.
+ * @tparam T the underlying data type for the calculation - usually 'double' or
+ *           'mpreal'.
+ * @param v the axis vector of rotation.
+ * @param theta the angle of rotation in radians.
+ * @return a 3x3 matrix that will perform an `angle` degree rotation about the
+ *         given axis `v`.
+ */
+template<typename T>
+Matrix3x3<T>
+rotation3x3(const Vector3D<T> &v, const T &theta) {
+
+  auto u = normalised(v);
+
+  auto one_minus_cos_theta = 1 - cos(theta);
+  auto sin_theta = sin(theta);
+  auto cos_theta = cos(theta);
+
+  return {
+
+      // First row
+      {
+          cos_theta + u.x() * u.x() * one_minus_cos_theta,
+          u.x() * u.y() * one_minus_cos_theta - u.z() * sin_theta,
+          u.x() * u.z() * one_minus_cos_theta + u.y() * sin_theta
+      },
+
+      // Second row
+      {
+          u.y() * u.x() * one_minus_cos_theta + u.z() * sin_theta,
+          cos_theta + u.y() * u.y() * one_minus_cos_theta,
+          u.y() * u.z() * one_minus_cos_theta - u.x() * sin_theta
+      },
+
+      // Third row
+      {
+          u.z() * u.x() * one_minus_cos_theta - u.y() * sin_theta,
+          u.z() * u.y() * one_minus_cos_theta + u.x() * sin_theta,
+          cos_theta + u.z() * u.z() * one_minus_cos_theta
+      }
+
+  };
+
+}
+
+/**
+ * Retrieves a homogenous rotation matrix using the axis/angle formulation.
+ * @tparam T the underlying data type for the calculation - usually 'double' or
+ *           'mpreal'.
+ * @param v the axis 3D vector of rotation.
+ * @param theta the angle of rotation in radians.
+ * @return a homogenous 4x4 matrix that will perform an `angle` degree rotation
+ *         about the given axis `v`.
+ */
+template<typename T>
+Matrix4x4<T>
+rotation4x4(const Vector3D<T> &v, const T &theta) {
+
+  auto m = rotation3x3(v, theta);
+
+  return {
+      {m(0, 0), m(0, 1), m(0, 2), 0},
+      {m(1, 0), m(1, 1), m(1, 2), 0},
+      {m(2, 0), m(2, 1), m(2, 2), 0},
+      {      0,       0,       0, 1}
+  };
+
+}
+
+/**
+ * Retrieves a homogenous rotation matrix using the axis/angle formulation.
+ * @tparam T the underlying data type for the calculation - usually 'double' or
+ *           'mpreal'.
+ * @param v the axis 4D vector of rotation.
+ * @param theta the angle of rotation in radians.
+ * @return a homogenous 4x4 matrix that will perform an `angle` degree rotation
+ *         about the given axis `v`.
+ */
+template<typename T>
+Matrix4x4<T>
+rotation4x4(const Vector4D<T> &v, const T &theta) {
+
+  auto m = rotation3x3({v.x(), v.y(), v.z()}, theta);
+
+  return {
+      {m(0, 0), m(0, 1), m(0, 2), 0},
+      {m(1, 0), m(1, 1), m(1, 2), 0},
+      {m(2, 0), m(2, 1), m(2, 2), 0},
+      {      0,       0,       0, 1}
+  };
+
+}
+
+
 
 } // namespace lgpl
 

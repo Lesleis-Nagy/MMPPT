@@ -103,11 +103,16 @@ MainWindow::MainWindow() {
           this, SLOT(slot_btn_holography_clicked()));
   connect(_btn_save_image, SIGNAL(clicked(bool)),
           this, SLOT(slot_btn_save_image_clicked()));
+  connect(_txt_image_nx, SIGNAL(textChanged(const QString)),
+          this, SLOT(slot_txt_image_nx_changed(QString)));
+  connect(_txt_image_ny, SIGNAL(textChanged(const QString)),
+          this, SLOT(slot_txt_image_ny_changed(QString)));
 
   connect(_preferencesAction, &QAction::triggered,
           this, &MainWindow::slot_menu_preferences);
 
-  emit(_current_image->update_image());
+  _txt_image_nx->setText(QString::number(_current_image->nx()));
+  _txt_image_ny->setText(QString::number(_current_image->ny()));
 
 }
 
@@ -170,6 +175,7 @@ MainWindow::slot_btn_load_tecplot_clicked() {
 
   _vtk_widget->update();
   _vtk_widget->renderWindow()->Render();
+  _mfm_computer = {_model.value(), 0};
 
 }
 
@@ -458,7 +464,51 @@ MainWindow::slot_chk_plane_hide_plane_changed(Qt::CheckState state) {
 void
 MainWindow::slot_btn_mfm_clicked() {
 
-  std::cout << "slot_btn_mfm_clicked()" << std::endl;
+  if (!_mfm_computer.has_value()) return;
+  if (!_sample_plane.has_value()) return;
+
+  const auto &mfm_fn = _mfm_computer.value();
+  const auto &sample_plane = _sample_plane.value();
+
+  std::vector<std::vector<double>> xs;
+  std::vector<std::vector<double>> ys;
+  std::vector<std::vector<double>> zs;
+
+  size_t nx = _current_image->nx();
+  size_t ny = _current_image->ny();
+
+  std::tie(xs, ys, zs) = _sample_plane->sample_points(
+      _current_image->nx(), _current_image->ny());
+
+  std::vector<std::vector<double>> mfm(ny);
+
+  using std::chrono::high_resolution_clock;
+  using std::chrono::duration_cast;
+  using std::chrono::duration;
+  using std::chrono::milliseconds;
+
+  auto t1 = high_resolution_clock::now();
+
+  #pragma omp parallel for num_threads(16)
+  for (size_t i = 0; i < ny; ++i) {
+    mfm[i].resize(nx);
+    for (size_t j = 0; j < nx; ++j) {
+      lcgl::Vector3D<double> r{xs[i][j], ys[i][j], zs[i][j]};
+      mfm[i][j] = mfm_fn(r, sample_plane.n());
+    }
+  }
+
+  auto t2 = high_resolution_clock::now();
+
+  auto ms_int = duration_cast<milliseconds>(t2 - t1);
+
+  /* Getting number of milliseconds as a double. */
+  duration<double, std::milli> ms_double = t2 - t1;
+
+  std::cout << ms_int.count() << "ms (complete image)\n";
+  std::cout << ms_double.count() << "ms (complete image)\n";
+
+  _current_image->update_image(mfm);
 
 }
 
@@ -528,6 +578,20 @@ MainWindow::slot_menu_preferences() {
 
   PreferencesDialog preferences_dialog;
   preferences_dialog.exec();
+
+}
+
+void
+MainWindow::slot_txt_image_nx_changed(QString value) {
+
+  _current_image->nx(value.toInt());
+
+}
+
+void
+MainWindow::slot_txt_image_ny_changed(QString value) {
+
+  _current_image->ny(value.toInt());
 
 }
 

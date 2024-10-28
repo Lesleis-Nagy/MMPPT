@@ -5,6 +5,8 @@
 #ifndef MMPPT_TOY_QT_VTK_EX005_MAIN_WINDOW_HPP_
 #define MMPPT_TOY_QT_VTK_EX005_MAIN_WINDOW_HPP_
 
+#include <omp.h>
+
 #include <iostream>
 
 #include <QErrorMessage>
@@ -39,6 +41,7 @@
 #include "model.hpp"
 #include "preferences_dialog.hpp"
 #include "sample_plane.hpp"
+#include "mfm_computer.hpp"
 
 namespace {
 
@@ -137,10 +140,11 @@ class MainWindow : public QMainWindow, private Ui::MainWindow {
   void slot_chk_plane_show_reference_points_changed(Qt::CheckState value);
   void slot_chk_plane_hide_plane_changed(Qt::CheckState value);
 
-
   void slot_btn_mfm_clicked();
   void slot_btn_holography_clicked();
   void slot_btn_save_image_clicked();
+  void slot_txt_image_nx_changed(const QString);
+  void slot_txt_image_ny_changed(const QString);
 
   void slot_menu_preferences();
 
@@ -167,6 +171,7 @@ class MainWindow : public QMainWindow, private Ui::MainWindow {
 
   std::optional<Model> _model;
   std::optional<SamplePlane> _sample_plane;
+  std::optional<MFMComputer> _mfm_computer;
 
   //--------------------------------------------------------------------------
 

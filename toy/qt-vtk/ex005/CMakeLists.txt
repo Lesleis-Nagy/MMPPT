@@ -10,6 +10,7 @@ qt_add_executable(${EXE_NAME}
         model.cpp
         main.cpp
         fraction.cpp
+        mfm_computer.cpp
 )
 
 set(MOC_GENERATED_INCLUDE_DIR
@@ -18,6 +19,7 @@ set(MOC_GENERATED_INCLUDE_DIR
 target_link_libraries(${EXE_NAME}
         PUBLIC Qt6::Core
                ${VTK_LIBRARIES}
+               OpenMP::OpenMP_CXX
 )
 
 target_include_directories(${EXE_NAME}
