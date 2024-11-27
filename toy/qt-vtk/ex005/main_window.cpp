@@ -176,6 +176,7 @@ MainWindow::slot_btn_load_tecplot_clicked() {
   _vtk_widget->update();
   _vtk_widget->renderWindow()->Render();
   _mfm_computer = {_model.value(), 0};
+  _holography_computer = {_model.value(), 0};
 
 }
 
@@ -515,7 +516,52 @@ MainWindow::slot_btn_mfm_clicked() {
 void
 MainWindow::slot_btn_holography_clicked() {
 
-  cout << "slot_btn_holography_clicked()" << std::endl;
+  if (!_holography_computer.has_value()) return;
+  if (!_sample_plane.has_value()) return;
+
+  const auto &holography_fn = _holography_computer.value();
+  const auto &sample_plane = _sample_plane.value();
+
+  std::vector<std::vector<double>> xs;
+  std::vector<std::vector<double>> ys;
+  std::vector<std::vector<double>> zs;
+
+  size_t nx = _current_image->nx();
+  size_t ny = _current_image->ny();
+
+  std::tie(xs, ys, zs) = _sample_plane->sample_points(
+      _current_image->nx(), _current_image->ny());
+
+  std::vector<std::vector<double>> holography(ny);
+
+  using std::chrono::high_resolution_clock;
+  using std::chrono::duration_cast;
+  using std::chrono::duration;
+  using std::chrono::milliseconds;
+
+  auto t1 = high_resolution_clock::now();
+
+  //#pragma omp parallel for num_threads(4)
+  for (size_t i = 0; i < ny; ++i) {
+    holography[i].resize(nx);
+    for (size_t j = 0; j < nx; ++j) {
+      lcgl::Vector3D<double> r{xs[i][j], ys[i][j], zs[i][j]};
+      holography[i][j] = sin(10.E5*holography_fn(r, sample_plane.n()));
+    }
+  }
+
+  auto t2 = high_resolution_clock::now();
+
+  auto ms_int = duration_cast<milliseconds>(t2 - t1);
+
+  /* Getting number of milliseconds as a double. */
+  duration<double, std::milli> ms_double = t2 - t1;
+
+  //std::cout << ms_int.count() << "ms (complete image)\n";
+  //std::cout << ms_double.count() << "ms (complete image)\n";
+
+  _current_image->update_image(holography);
+
 
 }
 

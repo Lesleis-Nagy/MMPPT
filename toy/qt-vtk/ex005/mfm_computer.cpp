@@ -12,7 +12,6 @@ MFMComputer::MFMComputer(
   const auto &vcl = mesh.vcl();
   const auto &m = model.field_list().fields()[model_field_index].vectors();
 
-
   for (const auto &tet : mesh.til()) {
 
     const auto &m0 = m[tet[0]];
@@ -56,19 +55,16 @@ MFMComputer::operator()(double x,  double y,  double z,
   return (*this)(r, n);
 
 }
+
 double MFMComputer::operator()(const lcgl::Vector3D<double> &r,
                                const lcgl::Vector3D<double> &n) const {
 
   lcgl::Vector3D<double> B_field = {0.0, 0.0, 0.0};
 
-
-
   //#pragma omp parallel for num_threads(5), reduction (+:sum)
   for (size_t i = 0; i < _vp_func.size(); ++i) {
     B_field += _vp_func[i](r);
   }
-
-
 
   return dot(B_field, n);
 

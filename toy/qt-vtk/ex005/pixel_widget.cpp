@@ -24,13 +24,15 @@ PixelWidget::paintEvent(QPaintEvent *) {
 
 }
 
-void PixelWidget::blank_image() {
+void
+PixelWidget::blank_image() {
 
   generate_blank_image();
 
 }
 
-void PixelWidget::update_image() {
+void
+PixelWidget::update_image() {
 
   generate_random_image();
 
@@ -53,7 +55,7 @@ PixelWidget::update_image(const std::vector<std::vector<double>> &scalars) {
   std::cout << "scalar min: " << scalar_min << std::endl;
   std::cout << "scalar max: " << scalar_max << std::endl;
 
-  auto palette = colormap::palettes.at("blues").rescale(scalar_min, scalar_max);
+  auto palette = colormap::palettes.at("greys").rescale(scalar_min, scalar_max);
 
   for (int i = 0; i < _image.width(); ++i) {
     for (int j = 0; j < _image.height(); ++j) {
@@ -105,7 +107,7 @@ PixelWidget::generate_blank_image() {
 
   _image = QImage(_nx, _ny, QImage::Format_RGB32);
 
-  const auto &palette = colormap::palettes.at("blues");
+  const auto &palette = colormap::palettes.at("greys");
 
   for (int i = 0; i < _image.width(); ++i) {
     for (int j = 0; j < _image.height(); ++j) {
@@ -122,7 +124,7 @@ PixelWidget::generate_random_image() {
 
   _image = QImage(_nx, _ny, QImage::Format_RGB32);
 
-  const auto &palette = colormap::palettes.at("blues");
+  const auto &palette = colormap::palettes.at("greys");
 
   for (int i = 0; i < _image.width(); ++i) {
     for (int j = 0; j < _image.height(); ++j) {

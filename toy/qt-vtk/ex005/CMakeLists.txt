@@ -11,6 +11,7 @@ qt_add_executable(${EXE_NAME}
         main.cpp
         fraction.cpp
         mfm_computer.cpp
+        holography_computer.cpp
 )
 
 set(MOC_GENERATED_INCLUDE_DIR

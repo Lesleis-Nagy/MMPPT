@@ -42,6 +42,7 @@
 #include "preferences_dialog.hpp"
 #include "sample_plane.hpp"
 #include "mfm_computer.hpp"
+#include "holography_computer.hpp"
 
 namespace {
 
@@ -172,6 +173,7 @@ class MainWindow : public QMainWindow, private Ui::MainWindow {
   std::optional<Model> _model;
   std::optional<SamplePlane> _sample_plane;
   std::optional<MFMComputer> _mfm_computer;
+  std::optional<HolographyComputer> _holography_computer;
 
   //--------------------------------------------------------------------------
 
